@@ -10,26 +10,26 @@ public class WindPlant extends PowerPlant {
     // ========== Class Variables (Static) ==========
 
     // Construction
-    protected static final double baseConstructionCost = 1200.0;
-    protected static final int baseConstructionTime = 1;
-    protected static final int defaultMaxLevel = 4;
+    public static final double BASE_CONSTRUCTION_COST = 1200.0;
+    public static final int BASE_CONSTRUCTION_TIME = 1;
+    public static final int DEFAULT_MAX_LEVEL = 4;
 
     // Stats at level 1
-    protected static final double basePowerOutput = 35.0;
-    protected static final double baseStorageCapacity = 105.0; // 3x ratio for wind variability
-    protected static final double baseDailyCost = 28.0;
-    protected static final double basePollutionRate = 0.0; // Eco-friendly
+    public static final double BASE_POWER_OUTPUT = 35.0;
+    public static final double BASE_STORAGE_CAPACITY = 105.0; // 3x ratio for wind variability
+    public static final double BASE_DAILY_COST = 28.0;
+    public static final double BASE_POLLUTION_RATE = 0.0; // Eco-friendly
 
     // Growth rates per level
-    protected static final double powerOutputGrowthRate = 1.48; // +48% per level
-    protected static final double storageGrowthRate = 1.42; // +42% per level
-    protected static final double dailyCostGrowthRate = 1.18; // +18% per level
-    protected static final double pollutionReductionRate = 1.0; // No pollution, no change
+    public static final double POWER_OUTPUT_GROWTH_RATE = 1.48; // +48% per level
+    public static final double STORAGE_GROWTH_RATE = 1.42; // +42% per level
+    public static final double DAILY_COST_GROWTH_RATE = 1.18; // +18% per level
+    public static final double POLLUTION_REDUCTION_RATE = 1.0; // No pollution, no change
 
     // Upgrade
-    protected static final double upgradeCostBase = 1500.0;
-    protected static final double upgradeCostMultiplier = 1.4;
-    protected static final int upgradeTimeBase = 2;
+    public static final double UPGRADE_COST_BASE = 1500.0;
+    public static final double UPGRADE_COST_MULTIPLIER = 1.4;
+    public static final int UPGRADE_TIME_BASE = 2;
 
     // ========== Constructor ==========
 
@@ -39,21 +39,7 @@ public class WindPlant extends PowerPlant {
      * @param id Unique identifier for this plant
      */
     public WindPlant(String id) {
-        super(id, basePowerOutput, baseStorageCapacity, baseDailyCost,
-                basePollutionRate, baseConstructionTime, defaultMaxLevel);
-    }
-
-    // ========== Static Getters for Class Variables ==========
-
-    public static double getBaseConstructionCost() {
-        return baseConstructionCost;
-    }
-
-    public static int getBaseConstructionTime() {
-        return baseConstructionTime;
-    }
-
-    public static int getDefaultMaxLevel() {
-        return defaultMaxLevel;
+        super(id, BASE_POWER_OUTPUT, BASE_STORAGE_CAPACITY, BASE_DAILY_COST,
+                BASE_POLLUTION_RATE, BASE_CONSTRUCTION_TIME, DEFAULT_MAX_LEVEL);
     }
 }

@@ -10,26 +10,26 @@ public class NuclearPlant extends PowerPlant {
     // ========== Class Variables (Static) ==========
 
     // Construction
-    protected static final double baseConstructionCost = 8000.0;
-    protected static final int baseConstructionTime = 5;
-    protected static final int defaultMaxLevel = 3; // Fewer levels due to complexity
+    public static final double BASE_CONSTRUCTION_COST = 8000.0;
+    public static final int BASE_CONSTRUCTION_TIME = 5;
+    public static final int DEFAULT_MAX_LEVEL = 3; // Fewer levels due to complexity
 
     // Stats at level 1
-    protected static final double basePowerOutput = 400.0;
-    protected static final double baseStorageCapacity = 800.0; // 2x ratio for safety reserves
-    protected static final double baseDailyCost = 140.0;
-    protected static final double basePollutionRate = 5.0; // Low (radioactive waste)
+    public static final double BASE_POWER_OUTPUT = 400.0;
+    public static final double BASE_STORAGE_CAPACITY = 800.0; // 2x ratio for safety reserves
+    public static final double BASE_DAILY_COST = 140.0;
+    public static final double BASE_POLLUTION_RATE = 5.0; // Low (radioactive waste)
 
     // Growth rates per level
-    protected static final double powerOutputGrowthRate = 1.35; // +35% per level
-    protected static final double storageGrowthRate = 1.40; // +40% per level
-    protected static final double dailyCostGrowthRate = 1.25; // +25% per level
-    protected static final double pollutionReductionRate = 0.90; // -10% per level (better waste management)
+    public static final double POWER_OUTPUT_GROWTH_RATE = 1.35; // +35% per level
+    public static final double STORAGE_GROWTH_RATE = 1.40; // +40% per level
+    public static final double DAILY_COST_GROWTH_RATE = 1.25; // +25% per level
+    public static final double POLLUTION_REDUCTION_RATE = 0.90; // -10% per level (better waste management)
 
     // Upgrade
-    protected static final double upgradeCostBase = 10000.0;
-    protected static final double upgradeCostMultiplier = 2.0;
-    protected static final int upgradeTimeBase = 6;
+    public static final double UPGRADE_COST_BASE = 10000.0;
+    public static final double UPGRADE_COST_MULTIPLIER = 2.0;
+    public static final int UPGRADE_TIME_BASE = 6;
 
     // ========== Constructor ==========
 
@@ -39,21 +39,7 @@ public class NuclearPlant extends PowerPlant {
      * @param id Unique identifier for this plant
      */
     public NuclearPlant(String id) {
-        super(id, basePowerOutput, baseStorageCapacity, baseDailyCost,
-                basePollutionRate, baseConstructionTime, defaultMaxLevel);
-    }
-
-    // ========== Static Getters for Class Variables ==========
-
-    public static double getBaseConstructionCost() {
-        return baseConstructionCost;
-    }
-
-    public static int getBaseConstructionTime() {
-        return baseConstructionTime;
-    }
-
-    public static int getDefaultMaxLevel() {
-        return defaultMaxLevel;
+        super(id, BASE_POWER_OUTPUT, BASE_STORAGE_CAPACITY, BASE_DAILY_COST,
+                BASE_POLLUTION_RATE, BASE_CONSTRUCTION_TIME, DEFAULT_MAX_LEVEL);
     }
 }

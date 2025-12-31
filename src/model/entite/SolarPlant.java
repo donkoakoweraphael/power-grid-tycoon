@@ -10,26 +10,26 @@ public class SolarPlant extends PowerPlant {
     // ========== Class Variables (Static) ==========
 
     // Construction
-    protected static final double baseConstructionCost = 800.0;
-    protected static final int baseConstructionTime = 1;
-    protected static final int defaultMaxLevel = 4;
+    public static final double BASE_CONSTRUCTION_COST = 800.0;
+    public static final int BASE_CONSTRUCTION_TIME = 1;
+    public static final int DEFAULT_MAX_LEVEL = 4;
 
     // Stats at level 1
-    protected static final double basePowerOutput = 40.0;
-    protected static final double baseStorageCapacity = 160.0; // 4x ratio for day/night buffering
-    protected static final double baseDailyCost = 20.0;
-    protected static final double basePollutionRate = 0.0; // Eco-friendly
+    public static final double BASE_POWER_OUTPUT = 40.0;
+    public static final double BASE_STORAGE_CAPACITY = 160.0; // 4x ratio for day/night buffering
+    public static final double BASE_DAILY_COST = 20.0;
+    public static final double BASE_POLLUTION_RATE = 0.0; // Eco-friendly
 
     // Growth rates per level
-    protected static final double powerOutputGrowthRate = 1.50; // +50% per level
-    protected static final double storageGrowthRate = 1.45; // +45% per level
-    protected static final double dailyCostGrowthRate = 1.15; // +15% per level
-    protected static final double pollutionReductionRate = 1.0; // No pollution, no change
+    public static final double POWER_OUTPUT_GROWTH_RATE = 1.50; // +50% per level
+    public static final double STORAGE_GROWTH_RATE = 1.45; // +45% per level
+    public static final double DAILY_COST_GROWTH_RATE = 1.15; // +15% per level
+    public static final double POLLUTION_REDUCTION_RATE = 1.0; // No pollution, no change
 
     // Upgrade
-    protected static final double upgradeCostBase = 1000.0;
-    protected static final double upgradeCostMultiplier = 1.4;
-    protected static final int upgradeTimeBase = 2;
+    public static final double UPGRADE_COST_BASE = 1000.0;
+    public static final double UPGRADE_COST_MULTIPLIER = 1.4;
+    public static final int UPGRADE_TIME_BASE = 2;
 
     // ========== Constructor ==========
 
@@ -39,21 +39,7 @@ public class SolarPlant extends PowerPlant {
      * @param id Unique identifier for this plant
      */
     public SolarPlant(String id) {
-        super(id, basePowerOutput, baseStorageCapacity, baseDailyCost,
-                basePollutionRate, baseConstructionTime, defaultMaxLevel);
-    }
-
-    // ========== Static Getters for Class Variables ==========
-
-    public static double getBaseConstructionCost() {
-        return baseConstructionCost;
-    }
-
-    public static int getBaseConstructionTime() {
-        return baseConstructionTime;
-    }
-
-    public static int getDefaultMaxLevel() {
-        return defaultMaxLevel;
+        super(id, BASE_POWER_OUTPUT, BASE_STORAGE_CAPACITY, BASE_DAILY_COST,
+                BASE_POLLUTION_RATE, BASE_CONSTRUCTION_TIME, DEFAULT_MAX_LEVEL);
     }
 }
