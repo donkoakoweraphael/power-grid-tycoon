@@ -6,8 +6,9 @@ import java.util.List;
 /**
  * Orchestrator class for the city simulation.
  * Manages buildings, economy, and global metrics.
+ * Acts as a data container for city state.
  */
-public class City implements CityOperations {
+public class City {
 
     private String name;
     private int currentDay;
@@ -45,152 +46,135 @@ public class City implements CityOperations {
 
         this.powerPlants = new ArrayList<>();
         this.residences = new ArrayList<>();
-
-        updateGlobalMetrics();
     }
 
-    @Override
-    public void advanceDay() {
-        // 1. Advance cycle for all buildings (construction/upgrades progress)
-        for (PowerPlant plant : powerPlants) {
-            plant.advanceCycle();
-        }
+    // ========== Getters ==========
 
-        // 2. Manage Energy
-        distributeEnergy();
-
-        // 3. Update Metrics
-        updateGlobalMetrics();
-
-        // 4. Handle Weekly Growth
-        if (currentDay % 7 == 0) {
-            handleWeeklyGrowth();
-        }
-
-        currentDay++;
-    }
-
-    @Override
-    public void distributeEnergy() {
-        // To be implemented: Logic for moving energy from plants to residences
-    }
-
-    @Override
-    public void updateGlobalMetrics() {
-        int pop = 0;
-        double demand = 0;
-        double pollution = 0;
-        double storage = 0;
-        double sumPP = 0;
-
-        for (Residence res : residences) {
-            pop += res.getCurrentOccupancy();
-            demand += res.getEnergyDemand();
-            sumPP += res.getPurchasingPower();
-        }
-
-        for (PowerPlant plant : powerPlants) {
-            pollution += plant.calculatePollution();
-            storage += plant.getStorageCapacity();
-        }
-
-        this.totalPopulation = pop;
-        this.totalEnergyDemand = demand;
-        this.totalPollution = pollution;
-        this.totalStorageCapacity = storage;
-        this.avgPurchasingPower = residences.isEmpty() ? 0 : sumPP / residences.size();
-
-        // Happiness logic to be refined
-    }
-
-    @Override
-    public void handleWeeklyGrowth() {
-        // To be implemented: Weekly population growth and auto-upgrade/build logic
-    }
-
-    // ========== Getters & Setters ==========
-
-    @Override
     public String getName() {
         return name;
     }
 
-    @Override
     public int getCurrentDay() {
         return currentDay;
     }
 
-    @Override
     public double getTotalCoins() {
         return totalCoins;
     }
 
-    @Override
-    public void setTotalCoins(double coins) {
-        this.totalCoins = coins;
-    }
-
-    @Override
     public double getElectricityPrice() {
         return electricityPrice;
     }
 
-    @Override
-    public void setElectricityPrice(double price) {
-        this.electricityPrice = price;
-    }
-
-    @Override
     public double getGlobalHappiness() {
         return globalHappiness;
     }
 
-    @Override
     public int getTotalPopulation() {
         return totalPopulation;
     }
 
-    @Override
     public double getTotalPollution() {
         return totalPollution;
     }
 
-    @Override
     public double getTotalEnergyAvailable() {
         return totalEnergyAvailable;
     }
 
-    @Override
     public double getTotalStorageCapacity() {
         return totalStorageCapacity;
     }
 
-    @Override
     public double getTotalEnergyDemand() {
         return totalEnergyDemand;
     }
 
-    @Override
     public double getAvgPurchasingPower() {
         return avgPurchasingPower;
     }
 
-    @Override
     public List<PowerPlant> getPowerPlants() {
         return powerPlants;
     }
 
-    @Override
     public List<Residence> getResidences() {
         return residences;
     }
 
+    // ========== Setters ==========
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setCurrentDay(int currentDay) {
+        this.currentDay = currentDay;
+    }
+
+    public void setTotalCoins(double totalCoins) {
+        this.totalCoins = totalCoins;
+    }
+
+    public void setElectricityPrice(double electricityPrice) {
+        this.electricityPrice = electricityPrice;
+    }
+
+    public void setGlobalHappiness(double globalHappiness) {
+        this.globalHappiness = globalHappiness;
+    }
+
+    public void setTotalPopulation(int totalPopulation) {
+        this.totalPopulation = totalPopulation;
+    }
+
+    public void setTotalPollution(double totalPollution) {
+        this.totalPollution = totalPollution;
+    }
+
+    public void setTotalEnergyAvailable(double totalEnergyAvailable) {
+        this.totalEnergyAvailable = totalEnergyAvailable;
+    }
+
+    public void setTotalStorageCapacity(double totalStorageCapacity) {
+        this.totalStorageCapacity = totalStorageCapacity;
+    }
+
+    public void setTotalEnergyDemand(double totalEnergyDemand) {
+        this.totalEnergyDemand = totalEnergyDemand;
+    }
+
+    public void setAvgPurchasingPower(double avgPurchasingPower) {
+        this.avgPurchasingPower = avgPurchasingPower;
+    }
+
+    public void setPowerPlants(List<PowerPlant> powerPlants) {
+        this.powerPlants = powerPlants;
+    }
+
+    public void setResidences(List<Residence> residences) {
+        this.residences = residences;
+    }
+
+    // ========== Standard Methods ==========
+
     @Override
+    public String toString() {
+        return "City{" +
+                "name='" + name + '\'' +
+                ", currentDay=" + currentDay +
+                ", totalCoins=" + totalCoins +
+                ", happiness=" + globalHappiness +
+                ", population=" + totalPopulation +
+                '}';
+    }
+
+    // ========== Other Methods ==========
+
     public void addPowerPlant(PowerPlant plant) {
         this.powerPlants.add(plant);
     }
 
-    @Override
     public void addResidence(Residence residence) {
         this.residences.add(residence);
     }
