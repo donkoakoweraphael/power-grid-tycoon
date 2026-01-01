@@ -32,6 +32,8 @@ public abstract class PowerPlant extends Building implements PowerPlantOperation
 
     // ========== Instance Variables ==========
 
+    // id, level, maxLevel inherited from GameEntity
+
     /**
      * Current operational status of the power plant.
      */
@@ -143,48 +145,6 @@ public abstract class PowerPlant extends Building implements PowerPlantOperation
 
     public int getRemainingTime() {
         return remainingTime;
-    }
-
-    // ========== Setters ==========
-
-    protected void setLevel(int level) {
-        this.level = level;
-    }
-
-    protected void setStatus(PlantStatus status) {
-        this.status = status;
-    }
-
-    protected void setPowerOutput(double powerOutput) {
-        this.powerOutput = powerOutput;
-    }
-
-    protected void setStorageCapacity(double storageCapacity) {
-        this.storageCapacity = storageCapacity;
-    }
-
-    protected void setCurrentEnergyStored(double currentEnergyStored) {
-        this.currentEnergyStored = currentEnergyStored;
-    }
-
-    protected void setDailyCost(double dailyCost) {
-        this.dailyCost = dailyCost;
-    }
-
-    protected void setPollutionRate(double pollutionRate) {
-        this.pollutionRate = pollutionRate;
-    }
-
-    protected void setUpgradeCost(double upgradeCost) {
-        this.upgradeCost = upgradeCost;
-    }
-
-    protected void setUpgradeTime(int upgradeTime) {
-        this.upgradeTime = upgradeTime;
-    }
-
-    protected void setRemainingTime(int remainingTime) {
-        this.remainingTime = remainingTime;
     }
 
     // ========== Lifecycle Management Methods ==========

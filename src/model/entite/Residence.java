@@ -57,47 +57,38 @@ public class Residence extends Building implements ResidenceOperations {
 
     // id, level, maxLevel getters inherited from GameEntity
 
-    @Override
     public int getMaxCapacity() {
         return maxCapacity;
     }
 
-    @Override
     public int getCurrentOccupancy() {
         return currentOccupancy;
     }
 
-    @Override
     public double getEnergyDemand() {
         return energyDemand;
     }
 
-    @Override
     public double getEnergyDemandMin() {
         return energyDemandMin;
     }
 
-    @Override
     public double getEnergyDemandMax() {
         return energyDemandMax;
     }
 
-    @Override
     public double getPurchasingPower() {
         return purchasingPower;
     }
 
-    @Override
     public double getPurchasingPowerMin() {
         return purchasingPowerMin;
     }
 
-    @Override
     public double getPurchasingPowerMax() {
         return purchasingPowerMax;
     }
 
-    @Override
     public boolean isSupplied() {
         return isSupplied;
     }
@@ -113,6 +104,20 @@ public class Residence extends Building implements ResidenceOperations {
     }
 
     // ========== Operations Implementation ==========
+
+    @Override
+    public void regenerateRandomValues() {
+        // Calculate bounds based on level and store in attributes
+        this.energyDemandMin = BASE_ENERGY_DEMAND_MIN * Math.pow(DEMAND_GROWTH_RATE, level - 1);
+        this.energyDemandMax = BASE_ENERGY_DEMAND_MAX * Math.pow(DEMAND_GROWTH_RATE, level - 1);
+
+        this.purchasingPowerMin = BASE_PURCHASING_POWER_MIN * Math.pow(PURCHASING_POWER_GROWTH_RATE, level - 1);
+        this.purchasingPowerMax = BASE_PURCHASING_POWER_MAX * Math.pow(PURCHASING_POWER_GROWTH_RATE, level - 1);
+
+        // Randomize within bounds using Math.random()
+        this.energyDemand = energyDemandMin + (energyDemandMax - energyDemandMin) * Math.random();
+        this.purchasingPower = purchasingPowerMin + (purchasingPowerMax - purchasingPowerMin) * Math.random();
+    }
 
     @Override
     public int assignOccupants(int count) {
@@ -147,19 +152,5 @@ public class Residence extends Building implements ResidenceOperations {
 
         // Update Values with new level factors
         regenerateRandomValues();
-    }
-
-    @Override
-    public void regenerateRandomValues() {
-        // Calculate bounds based on level and store in attributes
-        this.energyDemandMin = BASE_ENERGY_DEMAND_MIN * Math.pow(DEMAND_GROWTH_RATE, level - 1);
-        this.energyDemandMax = BASE_ENERGY_DEMAND_MAX * Math.pow(DEMAND_GROWTH_RATE, level - 1);
-
-        this.purchasingPowerMin = BASE_PURCHASING_POWER_MIN * Math.pow(PURCHASING_POWER_GROWTH_RATE, level - 1);
-        this.purchasingPowerMax = BASE_PURCHASING_POWER_MAX * Math.pow(PURCHASING_POWER_GROWTH_RATE, level - 1);
-
-        // Randomize within bounds using Math.random()
-        this.energyDemand = energyDemandMin + (energyDemandMax - energyDemandMin) * Math.random();
-        this.purchasingPower = purchasingPowerMin + (purchasingPowerMax - purchasingPowerMin) * Math.random();
     }
 }

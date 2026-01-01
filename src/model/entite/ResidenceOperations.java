@@ -6,49 +6,7 @@ package model.entite;
  * used for PowerPlant.
  */
 public interface ResidenceOperations {
-
-    // ========== Getters ==========
-
-    String getId();
-
-    int getLevel();
-
-    int getMaxLevel();
-
-    int getMaxCapacity();
-
-    int getCurrentOccupancy();
-
-    /**
-     * Gets the daily energy demand of this residence in MWh.
-     * 
-     * @return energy demand per day
-     */
-    double getEnergyDemand();
-
-    double getEnergyDemandMin();
-
-    double getEnergyDemandMax();
-
-    /**
-     * Gets the purchasing power of this residence (price they are willing to pay).
-     * 
-     * @return purchasing power in coins/MWh
-     */
-    double getPurchasingPower();
-
-    double getPurchasingPowerMin();
-
-    double getPurchasingPowerMax();
-
-    /**
-     * Checks if the residence has been sufficiently supplied with energy for the
-     * current cycle.
-     * 
-     * @return true if supplied energy >= energy demand
-     */
-    boolean isSupplied();
-
+    
     /**
      * Gets the remaining capacity for new occupants.
      * 
@@ -64,6 +22,13 @@ public interface ResidenceOperations {
     boolean isFull();
 
     // ========== Operations ==========
+
+    /**
+     * Regenerates random values for energy demand and purchasing power
+     * within the bounds defined by the current level.
+     * Simulates fluctuation in market conditions or usage patterns.
+     */
+    void regenerateRandomValues();
 
     /**
      * Assigns a number of occupants to the residence.
@@ -89,11 +54,4 @@ public interface ResidenceOperations {
      * @throws IllegalStateException if already at max level
      */
     void upgrade();
-
-    /**
-     * Regenerates random values for energy demand and purchasing power
-     * within the bounds defined by the current level.
-     * Simulates fluctuation in market conditions or usage patterns.
-     */
-    void regenerateRandomValues();
 }
