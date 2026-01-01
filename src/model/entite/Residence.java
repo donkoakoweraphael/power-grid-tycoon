@@ -4,7 +4,7 @@ package model.entite;
  * Represents a residential building in the city.
  * Consumes energy and houses the population.
  */
-public class Residence implements ResidenceOperations {
+public class Residence extends Building implements ResidenceOperations {
 
     // ========== Class Variables (Static) - Constants ==========
 
@@ -23,9 +23,7 @@ public class Residence implements ResidenceOperations {
 
     // ========== Instance Variables ==========
 
-    private String id;
-    private int level;
-    private int maxLevel;
+    // id, level, maxLevel inherited from GameEntity
 
     // Occupancy
     private int maxCapacity;
@@ -47,9 +45,7 @@ public class Residence implements ResidenceOperations {
     // ========== Constructor ==========
 
     public Residence(String id) {
-        this.id = id;
-        this.level = 1;
-        this.maxLevel = DEFAULT_MAX_LEVEL;
+        super(id, DEFAULT_MAX_LEVEL);
         this.maxCapacity = BASE_MAX_CAPACITY;
         this.currentOccupancy = 0;
         this.isSupplied = true; // Default to true until first check
@@ -59,20 +55,7 @@ public class Residence implements ResidenceOperations {
 
     // ========== Getters ==========
 
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public int getLevel() {
-        return level;
-    }
-
-    @Override
-    public int getMaxLevel() {
-        return maxLevel;
-    }
+    // id, level, maxLevel getters inherited from GameEntity
 
     @Override
     public int getMaxCapacity() {
