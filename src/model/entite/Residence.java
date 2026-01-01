@@ -3,8 +3,9 @@ package model.entite;
 /**
  * Represents a residential building in the city.
  * Consumes energy and houses the population.
+ * Acts as a data container for residence state.
  */
-public class Residence extends Building implements ResidenceOperations {
+public class Residence extends Building {
 
     // ========== Class Variables (Static) - Constants ==========
 
@@ -23,7 +24,7 @@ public class Residence extends Building implements ResidenceOperations {
 
     // ========== Instance Variables ==========
 
-    // id, level, maxLevel inherited from GameEntity
+    // id, level, maxLevel inherited from Building
 
     // Occupancy
     private int maxCapacity;
@@ -55,7 +56,7 @@ public class Residence extends Building implements ResidenceOperations {
 
     // ========== Getters ==========
 
-    // id, level, maxLevel getters inherited from GameEntity
+    // id, level, maxLevel getters inherited from Building
 
     public int getMaxCapacity() {
         return maxCapacity;
@@ -93,19 +94,71 @@ public class Residence extends Building implements ResidenceOperations {
         return isSupplied;
     }
 
-    @Override
     public int getAvailableCapacity() {
         return maxCapacity - currentOccupancy;
     }
 
-    @Override
     public boolean isFull() {
         return currentOccupancy >= maxCapacity;
     }
 
-    // ========== Operations Implementation ==========
+    // ========== Setters ==========
+
+    public void setMaxCapacity(int maxCapacity) {
+        this.maxCapacity = maxCapacity;
+    }
+
+    public void setCurrentOccupancy(int currentOccupancy) {
+        this.currentOccupancy = currentOccupancy;
+    }
+
+    public void setEnergyDemand(double energyDemand) {
+        this.energyDemand = energyDemand;
+    }
+
+    public void setEnergyDemandMin(double energyDemandMin) {
+        this.energyDemandMin = energyDemandMin;
+    }
+
+    public void setEnergyDemandMax(double energyDemandMax) {
+        this.energyDemandMax = energyDemandMax;
+    }
+
+    public void setPurchasingPower(double purchasingPower) {
+        this.purchasingPower = purchasingPower;
+    }
+
+    public void setPurchasingPowerMin(double purchasingPowerMin) {
+        this.purchasingPowerMin = purchasingPowerMin;
+    }
+
+    public void setPurchasingPowerMax(double purchasingPowerMax) {
+        this.purchasingPowerMax = purchasingPowerMax;
+    }
+
+    public void setSupplied(boolean supplied) {
+        isSupplied = supplied;
+    }
+
+    // ========== Standard Methods ==========
 
     @Override
+    public String toString() {
+        return "Residence{" +
+                "id='" + id + '\'' +
+                ", level=" + level +
+                ", currentOccupancy=" + currentOccupancy +
+                ", energyDemand=" + energyDemand +
+                ", isSupplied=" + isSupplied +
+                '}';
+    }
+
+    // ========== Fluctuation Methods ==========
+
+    /**
+     * Regenerates random values for energy demand and purchasing power
+     * within the bounds defined by the current level.
+     */
     public void regenerateRandomValues() {
         // Calculate bounds based on level and store in attributes
         this.energyDemandMin = BASE_ENERGY_DEMAND_MIN * Math.pow(DEMAND_GROWTH_RATE, level - 1);
@@ -117,40 +170,5 @@ public class Residence extends Building implements ResidenceOperations {
         // Randomize within bounds using Math.random()
         this.energyDemand = energyDemandMin + (energyDemandMax - energyDemandMin) * Math.random();
         this.purchasingPower = purchasingPowerMin + (purchasingPowerMax - purchasingPowerMin) * Math.random();
-    }
-
-    @Override
-    public int assignOccupants(int count) {
-        int spaceAvailable = maxCapacity - currentOccupancy;
-        int toAdd = Math.min(count, spaceAvailable);
-
-        // Handle negative count (removing occupants)
-        if (count < 0) {
-            toAdd = Math.max(count, -currentOccupancy);
-        }
-
-        currentOccupancy += toAdd;
-        return toAdd;
-    }
-
-    @Override
-    public void supplyEnergy(double amount) {
-        // Threshold: generous tolerance (e.g. 95% of demand is considered supplied)
-        this.isSupplied = amount >= (energyDemand * 0.95);
-    }
-
-    @Override
-    public void upgrade() {
-        if (level >= maxLevel) {
-            throw new IllegalStateException("Residence is already at max level");
-        }
-
-        level++;
-
-        // Update Capacity
-        maxCapacity = (int) (maxCapacity * CAPACITY_GROWTH_RATE);
-
-        // Update Values with new level factors
-        regenerateRandomValues();
     }
 }

@@ -3,8 +3,9 @@ package model.entite;
 /**
  * Abstract base class representing a power plant in the game.
  * All specific power plant types inherit from this class.
+ * Acts as a data container for power plant state.
  */
-public abstract class PowerPlant extends Building implements PowerPlantOperations {
+public abstract class PowerPlant extends Building {
 
     // ========== Class Variables (Static) - Default Values ==========
 
@@ -32,7 +33,7 @@ public abstract class PowerPlant extends Building implements PowerPlantOperation
 
     // ========== Instance Variables ==========
 
-    // id, level, maxLevel inherited from GameEntity
+    // id, level, maxLevel inherited from Building
 
     /**
      * Current operational status of the power plant.
@@ -109,7 +110,7 @@ public abstract class PowerPlant extends Building implements PowerPlantOperation
 
     // ========== Getters ==========
 
-    // id, level, maxLevel getters are inherited from GameEntity
+    // id, level, maxLevel getters are inherited from Building
 
     public PlantStatus getStatus() {
         return status;
@@ -147,132 +148,57 @@ public abstract class PowerPlant extends Building implements PowerPlantOperation
         return remainingTime;
     }
 
-    // ========== Lifecycle Management Methods ==========
-    // Implementation of PowerPlantOperations interface
+    // ========== Setters ==========
 
-    @Override
-    public void advanceCycle() {
-        // To be implemented
+    public void setStatus(PlantStatus status) {
+        this.status = status;
     }
 
-    @Override
-    public boolean canUpgrade() {
-        // To be implemented
-        return false;
+    public void setPowerOutput(double powerOutput) {
+        this.powerOutput = powerOutput;
     }
 
-    @Override
-    public void startUpgrade() {
-        // To be implemented
+    public void setStorageCapacity(double storageCapacity) {
+        this.storageCapacity = storageCapacity;
     }
 
-    @Override
-    public void completeConstruction() {
-        // To be implemented
+    public void setCurrentEnergyStored(double currentEnergyStored) {
+        this.currentEnergyStored = currentEnergyStored;
     }
 
-    @Override
-    public void activate() {
-        // To be implemented
+    public void setDailyCost(double dailyCost) {
+        this.dailyCost = dailyCost;
     }
 
-    @Override
-    public void deactivate() {
-        // To be implemented
+    public void setPollutionRate(double pollutionRate) {
+        this.pollutionRate = pollutionRate;
     }
 
-    // ========== Energy Management Methods ==========
-
-    @Override
-    public double produceEnergy() {
-        // To be implemented
-        return 0.0;
+    public void setUpgradeCost(double upgradeCost) {
+        this.upgradeCost = upgradeCost;
     }
 
-    @Override
-    public double storeEnergy(double amount) {
-        // To be implemented
-        return 0.0;
+    public void setUpgradeTime(int upgradeTime) {
+        this.upgradeTime = upgradeTime;
     }
 
-    @Override
-    public double releaseEnergy(double requested) {
-        // To be implemented
-        return 0.0;
+    public void setRemainingTime(int remainingTime) {
+        this.remainingTime = remainingTime;
     }
 
-    @Override
-    public double getAvailableEnergy() {
-        // To be implemented
-        return 0.0;
-    }
+    // ========== Standard Methods ==========
 
-    // ========== Financial & Pollution Calculations ==========
-
-    @Override
-    public double calculateDailyCost() {
-        // To be implemented
-        return 0.0;
-    }
-
-    @Override
-    public double calculateUpgradeCost() {
-        // To be implemented
-        return 0.0;
-    }
-
-    @Override
-    public int calculateUpgradeTime() {
-        // To be implemented
-        return 0;
-    }
-
-    @Override
-    public double calculatePollution() {
-        // To be implemented
-        return 0.0;
-    }
-
-    // ========== Status & Information Methods ==========
-
-    @Override
-    public boolean isOperational() {
-        // To be implemented
-        return false;
-    }
-
-    @Override
-    public boolean isUnderConstruction() {
-        // To be implemented
-        return false;
-    }
-
-    @Override
-    public boolean isUpgrading() {
-        // To be implemented
-        return false;
-    }
-
-    @Override
-    public String getStatusDescription() {
-        // To be implemented
-        return "";
-    }
-
-    @Override
-    public double getEfficiencyRatio() {
-        // To be implemented
-        return 0.0;
-    }
-
-    /**
-     * Gets a detailed string representation of this power plant.
-     * 
-     * @return detailed plant information
-     */
     @Override
     public String toString() {
-        // To be implemented
-        return "";
+        return "PowerPlant{" +
+                "id='" + id + '\'' +
+                ", level=" + level +
+                ", status=" + status +
+                ", powerOutput=" + powerOutput +
+                ", storageCapacity=" + storageCapacity +
+                ", currentEnergyStored=" + currentEnergyStored +
+                ", dailyCost=" + dailyCost +
+                ", pollutionRate=" + pollutionRate +
+                '}';
     }
 }
