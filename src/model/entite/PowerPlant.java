@@ -4,7 +4,7 @@ package model.entite;
  * Abstract base class representing a power plant in the game.
  * All specific power plant types inherit from this class.
  */
-public abstract class PowerPlant implements PowerPlantOperations {
+public abstract class PowerPlant extends Building implements PowerPlantOperations {
 
     // ========== Class Variables (Static) - Default Values ==========
 
@@ -32,20 +32,7 @@ public abstract class PowerPlant implements PowerPlantOperations {
 
     // ========== Instance Variables ==========
 
-    /**
-     * Unique identifier for this power plant.
-     */
-    private String id;
-
-    /**
-     * Current level of the power plant (starts at 1).
-     */
-    private int level;
-
-    /**
-     * Maximum level this power plant can reach.
-     */
-    private int maxLevel;
+    // id, level, maxLevel inherited from GameEntity
 
     /**
      * Current operational status of the power plant.
@@ -108,9 +95,7 @@ public abstract class PowerPlant implements PowerPlantOperations {
     protected PowerPlant(String id, double basePowerOutput, double baseStorageCapacity,
             double baseDailyCost, double basePollutionRate,
             int constructionTime, int maxLevel) {
-        this.id = id;
-        this.level = 1;
-        this.maxLevel = maxLevel;
+        super(id, maxLevel);
         this.status = PlantStatus.UNDER_CONSTRUCTION;
         this.powerOutput = basePowerOutput;
         this.storageCapacity = baseStorageCapacity;
@@ -124,17 +109,7 @@ public abstract class PowerPlant implements PowerPlantOperations {
 
     // ========== Getters ==========
 
-    public String getId() {
-        return id;
-    }
-
-    public int getLevel() {
-        return level;
-    }
-
-    public int getMaxLevel() {
-        return maxLevel;
-    }
+    // id, level, maxLevel getters are inherited from GameEntity
 
     public PlantStatus getStatus() {
         return status;
@@ -170,48 +145,6 @@ public abstract class PowerPlant implements PowerPlantOperations {
 
     public int getRemainingTime() {
         return remainingTime;
-    }
-
-    // ========== Setters ==========
-
-    protected void setLevel(int level) {
-        this.level = level;
-    }
-
-    protected void setStatus(PlantStatus status) {
-        this.status = status;
-    }
-
-    protected void setPowerOutput(double powerOutput) {
-        this.powerOutput = powerOutput;
-    }
-
-    protected void setStorageCapacity(double storageCapacity) {
-        this.storageCapacity = storageCapacity;
-    }
-
-    protected void setCurrentEnergyStored(double currentEnergyStored) {
-        this.currentEnergyStored = currentEnergyStored;
-    }
-
-    protected void setDailyCost(double dailyCost) {
-        this.dailyCost = dailyCost;
-    }
-
-    protected void setPollutionRate(double pollutionRate) {
-        this.pollutionRate = pollutionRate;
-    }
-
-    protected void setUpgradeCost(double upgradeCost) {
-        this.upgradeCost = upgradeCost;
-    }
-
-    protected void setUpgradeTime(int upgradeTime) {
-        this.upgradeTime = upgradeTime;
-    }
-
-    protected void setRemainingTime(int remainingTime) {
-        this.remainingTime = remainingTime;
     }
 
     // ========== Lifecycle Management Methods ==========
