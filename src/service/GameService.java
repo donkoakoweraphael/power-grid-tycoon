@@ -47,4 +47,9 @@ public interface GameService {
      * Loads a game save.
      */
     model.GameModel loadGame(String fileName);
+
+    /**
+     * Retrieves metadata for a save slot.
+     */
+    service.dto.SaveMetadata getSaveMetadata(String fileName);
 }

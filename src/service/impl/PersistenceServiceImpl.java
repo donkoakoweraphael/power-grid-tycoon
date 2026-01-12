@@ -49,4 +49,10 @@ public class PersistenceServiceImpl implements PersistenceService {
             return null;
         }
     }
+
+    @Override
+    public boolean exists(String fileName) {
+        String path = SAVE_DIR + fileName + ".tycoon";
+        return new File(path).exists();
+    }
 }

@@ -15,4 +15,9 @@ public interface PersistenceService {
      * Loads a game state from a file.
      */
     GameModel load(String fileName);
+
+    /**
+     * Checks if a save file exists.
+     */
+    boolean exists(String fileName);
 }

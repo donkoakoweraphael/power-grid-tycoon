@@ -12,6 +12,7 @@ import service.ResidenceService;
 import exception.InsufficientFundsException;
 import exception.BusinessRuleException;
 import model.GameModel;
+import service.dto.SaveMetadata;
 
 import java.util.Optional;
 
@@ -181,5 +182,23 @@ public class GameServiceImpl implements GameService {
             return persistenceService.load(fileName);
         }
         return null;
+    }
+
+    @Override
+    public SaveMetadata getSaveMetadata(String fileName) {
+        if (persistenceService == null || !persistenceService.exists(fileName)) {
+            return new SaveMetadata("", 0, 0, false);
+        }
+
+        GameModel loadedModel = persistenceService.load(fileName);
+        if (loadedModel == null) {
+            return new SaveMetadata("", 0, 0, false);
+        }
+
+        return new SaveMetadata(
+                loadedModel.getCity().getName(),
+                loadedModel.getCity().getCurrentDay(),
+                loadedModel.getCity().getTotalCoins(),
+                true);
     }
 }
