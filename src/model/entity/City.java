@@ -10,6 +10,13 @@ import java.util.List;
  */
 public class City {
 
+    // Simulation Constants
+    public static final double POLLUTION_DISSIPATION_RATE = 0.05; // 5% per day
+    public static final double SATURATION_THRESHOLD_DENSIFY = 0.90; // 90% full
+    public static final double SATURATION_THRESHOLD_EXPAND = 0.95; // 95% full
+    public static final double HAPPINESS_THRESHOLD_GROWTH = 70.0;
+    public static final double HAPPINESS_THRESHOLD_DECAY = 40.0;
+
     private String name;
     private int currentDay;
     private double totalCoins;

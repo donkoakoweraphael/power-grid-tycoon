@@ -42,14 +42,17 @@ public class ResidenceServiceImpl implements ResidenceService {
         int current = residence.getCurrentOccupancy();
         int max = residence.getMaxCapacity();
 
-        // Simple migration logic
-        if (happiness > 70 && current < max) {
-            // People move in (max 5% of capacity)
-            int moveIn = (int) (max * 0.05 * Math.random()) + 1;
+        if (happiness > model.entity.City.HAPPINESS_THRESHOLD_GROWTH && current < max) {
+            // Growth
+            double rate = Residence.MIN_GROWTH_RATE
+                    + (Residence.MAX_GROWTH_RATE - Residence.MIN_GROWTH_RATE) * Math.random();
+            int moveIn = (int) (max * rate) + 1;
             residence.setCurrentOccupancy(Math.min(max, current + moveIn));
-        } else if (happiness < 40 && current > 0) {
-            // People leave
-            int leave = (int) (current * 0.1 * Math.random()) + 1;
+        } else if (happiness < model.entity.City.HAPPINESS_THRESHOLD_DECAY && current > 0) {
+            // Decay
+            double rate = Residence.MIN_DECAY_RATE
+                    + (Residence.MAX_DECAY_RATE - Residence.MIN_DECAY_RATE) * Math.random();
+            int leave = (int) (current * rate) + 1;
             residence.setCurrentOccupancy(Math.max(0, current - leave));
         }
     }

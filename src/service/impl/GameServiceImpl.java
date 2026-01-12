@@ -17,11 +17,10 @@ public class GameServiceImpl implements GameService {
     private final PowerPlantService powerPlantService;
     private final ResidenceService residenceService;
 
-    public GameServiceImpl(CityService cityService, PowerPlantService powerPlantService,
-            ResidenceService residenceService) {
-        this.cityService = cityService;
-        this.powerPlantService = powerPlantService;
-        this.residenceService = residenceService;
+    public GameServiceImpl() {
+        this.cityService = new CityServiceImpl();
+        this.powerPlantService = new PowerPlantServiceImpl();
+        this.residenceService = new ResidenceServiceImpl();
     }
 
     @Override
