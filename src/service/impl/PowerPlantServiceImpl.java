@@ -1,6 +1,6 @@
 package service.impl;
 
-import model.entity.PlantStatus;
+import model.enums.PlantStatus;
 import model.entity.PowerPlant;
 import service.PowerPlantService;
 
