@@ -1,0 +1,153 @@
+package viewmodel;
+
+import model.GameModel;
+import model.enums.GameState;
+import model.entity.PowerPlant;
+import model.entity.Residence;
+import observer.GameModelObserver;
+import observer.GameViewObserver;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * ViewModel for the game. Acts as an adapter between the Model and the View.
+ * It listens to the Model changes and notifies the View listeners.
+ */
+public class GameViewModel implements GameModelObserver {
+
+    private final GameModel model;
+    private final List<GameViewObserver> viewListeners = new ArrayList<>();
+
+    public GameViewModel(GameModel model) {
+        this.model = model;
+        // Register this ViewModel as an observer of the Model
+        this.model.addObserver(this);
+    }
+
+    // ========== View Notification ==========
+
+    public void addViewListener(GameViewObserver listener) {
+        viewListeners.add(listener);
+    }
+
+    private void notifyView() {
+        for (GameViewObserver listener : viewListeners) {
+            listener.onViewUpdated();
+        }
+    }
+
+    @Override
+    public void onModelUpdated(GameModel model) {
+        // When the model changes, we notify our view listeners
+        notifyView();
+    }
+
+    // ========== Data Accessors for the View ==========
+
+    // --- Global Info ---
+    public String getCityName() {
+        return model.getCity().getName();
+    }
+
+    public String getCurrentDayText() {
+        return "Day " + model.getCity().getCurrentDay();
+    }
+
+    public String getCoinsText() {
+        return String.format("%.0f Coins", model.getCity().getTotalCoins());
+    }
+
+    public double getHappinessValue() {
+        return model.getCity().getGlobalHappiness();
+    }
+
+    public String getHappinessText() {
+        return String.format("%.1f %%", model.getCity().getGlobalHappiness());
+    }
+
+    public String getPopulationText() {
+        return model.getCity().getTotalPopulation() + " Citizens";
+    }
+
+    public double getPollutionValue() {
+        return model.getCity().getTotalPollution();
+    }
+
+    public String getPollutionText() {
+        return String.format("%.1f Tons", model.getCity().getTotalPollution());
+    }
+
+    // --- Energy Metrics ---
+    public String getProductionText() {
+        return String.format("%.1f MWh", model.getCity().getTotalEnergyAvailable());
+    }
+
+    public String getDemandText() {
+        return String.format("%.1f MWh", model.getCity().getTotalEnergyDemand());
+    }
+
+    public double getGridSaturation() {
+        if (model.getCity().getTotalEnergyAvailable() == 0)
+            return 0;
+        return model.getCity().getTotalEnergyDemand() / model.getCity().getTotalEnergyAvailable();
+    }
+
+    public String getStorageText() {
+        return String.format("%.1f / %.1f MWh",
+                calculateTotalStoredEnergy(),
+                model.getCity().getTotalStorageCapacity());
+    }
+
+    private double calculateTotalStoredEnergy() {
+        return model.getCity().getPowerPlants().stream()
+                .mapToDouble(PowerPlant::getCurrentEnergyStored)
+                .sum();
+    }
+
+    public double getStorageRatio() {
+        if (model.getCity().getTotalStorageCapacity() == 0)
+            return 0;
+        return calculateTotalStoredEnergy() / model.getCity().getTotalStorageCapacity();
+    }
+
+    // --- Economy ---
+    public double getElectricityPrice() {
+        return model.getCity().getElectricityPrice();
+    }
+
+    // --- Lists ---
+    public List<PowerPlant> getPowerPlants() {
+        return model.getCity().getPowerPlants();
+    }
+
+    public List<Residence> getResidences() {
+        return model.getCity().getResidences();
+    }
+
+    // --- Stats History ---
+    public List<Double> getCoinHistory() {
+        return model.getCoinHistory();
+    }
+
+    public List<Double> getDemandHistory() {
+        return model.getDemandHistory();
+    }
+
+    public List<Double> getHappinessHistory() {
+        return model.getHappinessHistory();
+    }
+
+    public List<Double> getPollutionHistory() {
+        return model.getPollutionHistory();
+    }
+
+    // --- Game Status ---
+    public boolean isGameOver() {
+        return model.getState() == GameState.GAME_OVER;
+    }
+
+    public GameState getGameState() {
+        return model.getState();
+    }
+}
