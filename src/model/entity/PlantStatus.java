@@ -1,4 +1,4 @@
-package model.entite;
+package model.entity;
 
 /**
  * Enum representing the operational status of a power plant.

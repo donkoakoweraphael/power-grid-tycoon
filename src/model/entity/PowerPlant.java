@@ -1,4 +1,4 @@
-package model.entite;
+package model.entity;
 
 /**
  * Abstract base class representing a power plant in the game.
