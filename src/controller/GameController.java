@@ -68,6 +68,10 @@ public class GameController {
         gameService.nextDay(model);
     }
 
+    public void handleNextDays(int days) {
+        gameService.nextDays(model, days);
+    }
+
     public void handleBuyPlant(String type, String id) {
         gameService.buyPowerPlant(model, type, id);
     }

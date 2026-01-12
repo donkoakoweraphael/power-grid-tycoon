@@ -34,6 +34,11 @@ public interface GameService {
     void nextDay(model.GameModel model);
 
     /**
+     * Advances the game by multiple days.
+     */
+    void nextDays(model.GameModel model, int days);
+
+    /**
      * Creates a new game with default starting conditions.
      */
     model.GameModel createNewGame(String cityName);

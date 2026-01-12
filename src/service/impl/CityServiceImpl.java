@@ -58,9 +58,13 @@ public class CityServiceImpl implements CityService {
         double capacity = city.getPowerPlants().stream()
                 .mapToDouble(PowerPlant::getStorageCapacity).sum();
 
+        double purchasingPower = city.getResidences().stream()
+                .mapToDouble(model.entity.Residence::getPurchasingPower).average().orElse(0.0);
+
         city.setTotalPopulation(population);
         city.setTotalEnergyDemand(demand);
         city.setTotalStorageCapacity(capacity);
+        city.setAvgPurchasingPower(purchasingPower);
     }
 
     @Override

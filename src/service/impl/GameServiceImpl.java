@@ -150,7 +150,23 @@ public class GameServiceImpl implements GameService {
         model.recordDailyStats();
 
         // Check for Game Over
-        if (model.getCity().getGlobalHappiness() <= 0) {
+        City city = model.getCity();
+        boolean gameOver = false;
+
+        // Conditions:
+        // 1. Happiness too low (<= 5.0)
+        if (city.getGlobalHappiness() <= 5.0)
+            gameOver = true;
+
+        // 2. Budget below zero
+        if (city.getTotalCoins() < 0)
+            gameOver = true;
+
+        // 3. Pollution too high (>= 1000)
+        if (city.getTotalPollution() >= 1000)
+            gameOver = true;
+
+        if (gameOver) {
             model.setState(GameState.GAME_OVER);
         }
 
@@ -158,14 +174,36 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
+    public void nextDays(GameModel model, int days) {
+        for (int i = 0; i < days; i++) {
+            if (model.getState() == GameState.GAME_OVER)
+                break;
+            nextDay(model);
+        }
+    }
+
+    @Override
     public GameModel createNewGame(String cityName) {
         City city = new City(cityName, 5000.0); // Starting budget
 
-        // Add one basic residence to start
-        city.addResidence(new Residence("res-start-1"));
+        // Starting infrastructure
+        SolarPlant solar = new SolarPlant("solar-start-1");
+        solar.setStatus(PlantStatus.ACTIVE);
+        city.addPowerPlant(solar);
+
+        // Initial Population: 100 (5 Residences of capacity 20)
+        for (int i = 1; i <= 5; i++) {
+            Residence res = new Residence("res-start-" + i);
+            res.setCurrentOccupancy(20);
+            city.addResidence(res);
+        }
 
         GameModel model = new GameModel(city);
         model.recordDailyStats(); // Initial stats
+
+        // Immediate Autosave
+        saveGame(model, "autosave");
+
         return model;
     }
 
