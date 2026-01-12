@@ -2,7 +2,7 @@ package model;
 
 import model.entity.City;
 import model.enums.GameState;
-import model.observer.GameObserver;
+import observer.GameModelObserver;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.LinkedList;
 public class GameModel implements Serializable {
     private City city;
     private GameState state;
-    private transient List<GameObserver> observers = new ArrayList<>();
+    private transient List<GameModelObserver> observers = new ArrayList<>();
 
     // Historical Statistics (Last 30 days)
     private final LinkedList<Double> coinHistory = new LinkedList<>();
@@ -59,20 +59,20 @@ public class GameModel implements Serializable {
 
     // ========== Observer Pattern ==========
 
-    public void addObserver(GameObserver observer) {
+    public void addObserver(GameModelObserver observer) {
         initObserversList();
         observers.add(observer);
     }
 
-    public void removeObserver(GameObserver observer) {
+    public void removeObserver(GameModelObserver observer) {
         initObserversList();
         observers.remove(observer);
     }
 
     public void notifyObservers() {
         initObserversList();
-        for (GameObserver o : observers) {
-            o.onGameStateChanged(this);
+        for (GameModelObserver o : observers) {
+            o.onModelUpdated(this);
         }
     }
 
