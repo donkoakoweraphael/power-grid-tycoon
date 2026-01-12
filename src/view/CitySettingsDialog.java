@@ -72,6 +72,7 @@ public class CitySettingsDialog extends JDialog {
         btnSave.addActionListener(e -> {
             controller.handleRenameCity(fieldName.getText());
             controller.handleSetPrice(sliderPrice.getValue());
+            controller.handleSave("autosave");
             dispose();
         });
 

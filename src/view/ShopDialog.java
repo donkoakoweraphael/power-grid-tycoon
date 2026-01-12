@@ -64,16 +64,17 @@ public class ShopDialog extends JDialog {
 
         JPanel left = new JPanel(new GridLayout(2, 1));
         left.setOpaque(false);
-        JLabel name = new JLabel(info.type().toUpperCase());
+        JLabel name = new JLabel(info.name());
         name.setForeground(Color.WHITE);
         name.setFont(new Font("SansSerif", Font.BOLD, 14));
 
-        JLabel price = new JLabel(String.format("Cost: %.0f | Power: %.1f MW", info.cost(), info.production()));
-        price.setForeground(Color.GRAY);
-        price.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        JLabel specs = new JLabel(String.format("Cost: %.0f | Power: %.1f MW | Storage: %.0f MWh",
+                info.cost(), info.production(), info.storage()));
+        specs.setForeground(Color.GRAY);
+        specs.setFont(new Font("SansSerif", Font.PLAIN, 12));
 
         left.add(name);
-        left.add(price);
+        left.add(specs);
         p.add(left, BorderLayout.CENTER);
 
         JButton btnBuy = new JButton("BUY");
