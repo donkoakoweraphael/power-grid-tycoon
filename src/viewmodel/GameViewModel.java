@@ -16,6 +16,12 @@ import java.util.List;
  */
 public class GameViewModel implements GameModelObserver {
 
+    /**
+     * Data Transfer Object for the Shop UI.
+     */
+    public record PlantShopInfo(String type, String name, double cost, double production, String description) {
+    }
+
     private final GameModel model;
     private final List<GameViewObserver> viewListeners = new ArrayList<>();
 
@@ -149,5 +155,22 @@ public class GameViewModel implements GameModelObserver {
 
     public GameState getGameState() {
         return model.getState();
+    }
+
+    // --- Shop & Construction ---
+    public List<PlantShopInfo> getAvailablePlants() {
+        List<PlantShopInfo> plants = new ArrayList<>();
+        plants.add(new PlantShopInfo("COAL", "Coal Plant", 1000, 120, "High output, high pollution."));
+        plants.add(new PlantShopInfo("GAS", "Gas Plant", 1500, 100, "Stable, moderate pollution."));
+        plants.add(new PlantShopInfo("SOLAR", "Solar Farm", 2000, 80, "Eco-friendly, variable output."));
+        plants.add(new PlantShopInfo("WIND", "Wind Farm", 2500, 95, "Green energy, high storage."));
+        plants.add(new PlantShopInfo("NUCLEAR", "Nuclear Plant", 8000, 500, "Massive clean power."));
+        plants.add(new PlantShopInfo("HYDRO", "Hydro Dam", 5000, 300, "Very stable, expensive."));
+        plants.add(new PlantShopInfo("BATTERY", "Battery Station", 3000, 0, "Massive energy storage."));
+        return plants;
+    }
+
+    public String getFormattedPrice() {
+        return String.format("%.2f Coins/MWh", model.getCity().getElectricityPrice());
     }
 }

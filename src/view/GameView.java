@@ -17,11 +17,14 @@ public class GameView extends JFrame implements GameViewObserver {
     private final GameController controller;
     private final GameViewModel viewModel;
 
-    // UI Components
-    private JLabel labelName, labelDay, labelCoins, labelHappiness, labelPollution;
+    private JLabel labelName, labelDay, labelCoins, labelHappiness, labelPollution, labelPrice;
     private JProgressBar progressHappiness, progressPollution;
     private JPanel panelPlants;
-    private JButton btnNextDay;
+    private JButton btnNextDay, btnMenu;
+    private JSlider sliderPrice;
+
+    // Graphs
+    private StatChart chartCoins, chartHappiness, chartPollution;
 
     public GameView(GameController controller) {
         this.controller = controller;
@@ -71,9 +74,37 @@ public class GameView extends JFrame implements GameViewObserver {
         btnNextDay.setFocusPainted(false);
         btnNextDay.addActionListener(e -> controller.handleNextDay());
 
+        btnMenu = new JButton("MENU");
+        btnMenu.setFont(new Font("SansSerif", Font.BOLD, 14));
+        btnMenu.setBackground(new Color(40, 40, 40));
+        btnMenu.setForeground(Color.YELLOW);
+        btnMenu.setFocusPainted(false);
+        btnMenu.addActionListener(e -> openMenu());
+
+        // Binding Escape key
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("ESCAPE"), "openMenu");
+        getRootPane().getActionMap().put("openMenu", new AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                openMenu();
+            }
+        });
+
+        labelPrice = createHeaderLabel(viewModel.getFormattedPrice(), 12);
+        sliderPrice = new JSlider(1, 50, (int) viewModel.getElectricityPrice());
+        sliderPrice.setOpaque(false);
+        sliderPrice.addChangeListener(e -> {
+            controller.handleSetPrice(sliderPrice.getValue());
+            labelPrice.setText(viewModel.getFormattedPrice());
+        });
+
         panelPlants = new JPanel();
         panelPlants.setLayout(new BoxLayout(panelPlants, BoxLayout.Y_AXIS));
         panelPlants.setOpaque(false);
+
+        chartCoins = new StatChart("COINS (30d)", new Color(76, 175, 80));
+        chartHappiness = new StatChart("HAPPINESS (30d)", new Color(33, 150, 243));
+        chartPollution = new StatChart("POLLUTION (30d)", new Color(255, 152, 0));
     }
 
     private void layoutComponents() {
@@ -104,18 +135,40 @@ public class GameView extends JFrame implements GameViewObserver {
         pPollution.add(progressPollution, BorderLayout.CENTER);
         topBar.add(pPollution);
 
+        JPanel pPrice = new JPanel(new BorderLayout());
+        pPrice.setOpaque(false);
+        pPrice.add(labelPrice, BorderLayout.NORTH);
+        pPrice.add(sliderPrice, BorderLayout.CENTER);
+        topBar.add(pPrice);
+
         topBar.add(btnNextDay);
+        topBar.add(btnMenu);
 
         add(topBar, BorderLayout.NORTH);
 
-        // --- Left Sidebar (Plants) ---
+        // --- Left Sidebar (Infras Only) ---
+        JPanel leftSidebar = new JPanel(new BorderLayout());
+        leftSidebar.setPreferredSize(new Dimension(320, 0));
+        leftSidebar.setBackground(new Color(25, 25, 25));
+
         JScrollPane scrollPlants = new JScrollPane(panelPlants);
-        scrollPlants.setPreferredSize(new Dimension(300, 0));
         scrollPlants.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(Color.GRAY), "INFRASTRUCTURE", 0, 0, null, Color.WHITE));
+                BorderFactory.createLineBorder(Color.GRAY), "YOUR INFRASTRUCTURE", 0, 0, null, Color.WHITE));
         scrollPlants.setOpaque(false);
         scrollPlants.getViewport().setOpaque(false);
-        add(scrollPlants, BorderLayout.WEST);
+
+        leftSidebar.add(scrollPlants, BorderLayout.CENTER);
+        add(leftSidebar, BorderLayout.WEST);
+
+        // --- Bottom Panel (Graphs) ---
+        JPanel bottomPanel = new JPanel(new GridLayout(1, 3, 10, 0));
+        bottomPanel.setBackground(new Color(25, 25, 25));
+        bottomPanel.setPreferredSize(new Dimension(0, 180));
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        bottomPanel.add(chartCoins);
+        bottomPanel.add(chartHappiness);
+        bottomPanel.add(chartPollution);
+        add(bottomPanel, BorderLayout.SOUTH);
 
         // --- Center (Map View Placeholder) ---
         JPanel cityMap = new JPanel() {
@@ -131,8 +184,24 @@ public class GameView extends JFrame implements GameViewObserver {
                 for (int i = 0; i < getHeight(); i += 50)
                     g.drawLine(0, i, getWidth(), i);
 
-                g.setColor(Color.CYAN);
-                g.drawString("CITY GRID VIEW - WIP", getWidth() / 2 - 50, getHeight() / 2);
+                // Draw Buildings
+                int offsetX = 50;
+                int offsetY = 50;
+
+                // Residences
+                g.setColor(new Color(100, 200, 255));
+                for (int i = 0; i < viewModel.getResidences().size(); i++) {
+                    g.fillRect(offsetX + (i % 5) * 60, offsetY + (i / 5) * 60, 40, 40);
+                }
+
+                // Power Plants
+                g.setColor(new Color(255, 200, 50));
+                for (int i = 0; i < viewModel.getPowerPlants().size(); i++) {
+                    g.fillOval(offsetX + (i % 5) * 60, offsetY + 200 + (i / 5) * 60, 40, 40);
+                }
+
+                g.setColor(Color.WHITE);
+                g.drawString("CITY LAYOUT (R: Blue, P: Yellow)", 50, 40);
             }
         };
         add(cityMap, BorderLayout.CENTER);
@@ -163,8 +232,15 @@ public class GameView extends JFrame implements GameViewObserver {
             panelPlants.add(createPlantWidget(plant));
             panelPlants.add(Box.createVerticalStrut(10));
         }
+
+        // Update Charts
+        chartCoins.setData(viewModel.getCoinHistory());
+        chartHappiness.setData(viewModel.getHappinessHistory());
+        chartPollution.setData(viewModel.getPollutionHistory());
+
         panelPlants.revalidate();
         panelPlants.repaint();
+        repaint(); // For cityMap
 
         // Check Game Over
         if (viewModel.isGameOver()) {
@@ -213,6 +289,10 @@ public class GameView extends JFrame implements GameViewObserver {
             default:
                 return Color.WHITE;
         }
+    }
+
+    private void openMenu() {
+        new InGameMenuDialog(this, controller).setVisible(true);
     }
 
     private void showGameOverDialog() {
