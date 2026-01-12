@@ -1,5 +1,6 @@
 package model.entity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +9,7 @@ import java.util.List;
  * Manages buildings, economy, and global metrics.
  * Acts as a data container for city state.
  */
-public class City {
+public class City implements Serializable {
 
     // Simulation Constants
     public static final double POLLUTION_DISSIPATION_RATE = 0.05; // 5% per day

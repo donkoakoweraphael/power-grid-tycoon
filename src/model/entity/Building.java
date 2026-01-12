@@ -1,10 +1,12 @@
 package model.entity;
 
+import java.io.Serializable;
+
 /**
  * Abstract base class for all game entities (buildings).
  * Defines common attributes like id, level, and maxLevel.
  */
-public abstract class Building {
+public abstract class Building implements Serializable {
 
     protected String id;
     protected int level;
