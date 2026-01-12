@@ -1,4 +1,6 @@
-package model.entite;
+package model.entity.plant;
+
+import model.entity.PowerPlant;
 
 /**
  * Natural gas power plant.

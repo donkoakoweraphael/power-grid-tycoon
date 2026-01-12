@@ -1,4 +1,4 @@
-package model.entite;
+package model.entity;
 
 /**
  * Represents a residential building in the city.
