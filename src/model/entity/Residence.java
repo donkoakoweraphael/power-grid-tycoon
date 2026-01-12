@@ -50,8 +50,6 @@ public class Residence extends Building {
         this.maxCapacity = BASE_MAX_CAPACITY;
         this.currentOccupancy = 0;
         this.isSupplied = true; // Default to true until first check
-
-        regenerateRandomValues(); // Initialize random demand/power
     }
 
     // ========== Getters ==========
@@ -153,22 +151,4 @@ public class Residence extends Building {
                 '}';
     }
 
-    // ========== Fluctuation Methods ==========
-
-    /**
-     * Regenerates random values for energy demand and purchasing power
-     * within the bounds defined by the current level.
-     */
-    public void regenerateRandomValues() {
-        // Calculate bounds based on level and store in attributes
-        this.energyDemandMin = BASE_ENERGY_DEMAND_MIN * Math.pow(DEMAND_GROWTH_RATE, level - 1);
-        this.energyDemandMax = BASE_ENERGY_DEMAND_MAX * Math.pow(DEMAND_GROWTH_RATE, level - 1);
-
-        this.purchasingPowerMin = BASE_PURCHASING_POWER_MIN * Math.pow(PURCHASING_POWER_GROWTH_RATE, level - 1);
-        this.purchasingPowerMax = BASE_PURCHASING_POWER_MAX * Math.pow(PURCHASING_POWER_GROWTH_RATE, level - 1);
-
-        // Randomize within bounds using Math.random()
-        this.energyDemand = energyDemandMin + (energyDemandMax - energyDemandMin) * Math.random();
-        this.purchasingPower = purchasingPowerMin + (purchasingPowerMax - purchasingPowerMin) * Math.random();
-    }
 }
