@@ -5,20 +5,57 @@ import service.GameService;
 import service.impl.GameServiceImpl;
 import viewmodel.GameViewModel;
 import model.entity.PowerPlant;
+import javax.swing.JFrame;
 
 /**
  * Main controller for the game.
  * Glue between the View and the Service/Model.
  */
 public class GameController {
-    private final GameModel model;
-    private final GameService gameService;
-    private final GameViewModel viewModel;
+    private GameModel model;
+    private GameService gameService;
+    private GameViewModel viewModel;
+    private JFrame currentView;
 
-    public GameController(GameModel model) {
-        this.model = model;
+    public GameController() {
         this.gameService = new GameServiceImpl();
+    }
+
+    public void start() {
+        showStartMenu();
+    }
+
+    private void showStartMenu() {
+        if (currentView != null)
+            currentView.dispose();
+        currentView = new view.StartMenuView(this);
+        currentView.setVisible(true);
+    }
+
+    public void handleNewGame(String cityName) {
+        this.model = gameService.createNewGame(cityName);
         this.viewModel = new GameViewModel(model);
+        launchGameView();
+    }
+
+    public void handleLoadGame(String slot) {
+        GameModel loaded = gameService.loadGame(slot);
+        if (loaded != null) {
+            this.model = loaded;
+            this.viewModel = new GameViewModel(model);
+            launchGameView();
+        }
+    }
+
+    public service.dto.SaveMetadata getSaveMetadata(String slot) {
+        return gameService.getSaveMetadata(slot);
+    }
+
+    private void launchGameView() {
+        if (currentView != null)
+            currentView.dispose();
+        currentView = new view.GameView(this);
+        currentView.setVisible(true);
     }
 
     public GameViewModel getViewModel() {
@@ -45,6 +82,13 @@ public class GameController {
 
     public void handleTogglePlant(PowerPlant plant) {
         gameService.togglePlantStatus(model, plant);
+    }
+
+    public void handleRenameCity(String newName) {
+        if (newName != null && !newName.trim().isEmpty()) {
+            model.getCity().setName(newName.trim());
+            model.notifyObservers();
+        }
     }
 
     public void handleSave(String slot) {

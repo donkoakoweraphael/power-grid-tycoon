@@ -1,9 +1,4 @@
-import model.GameModel;
 import controller.GameController;
-import service.GameService;
-import service.impl.GameServiceImpl;
-import view.GameView;
-
 import javax.swing.SwingUtilities;
 
 /**
@@ -12,19 +7,13 @@ import javax.swing.SwingUtilities;
 public class Main {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            // 1. Setup Services
-            GameService gameService = new GameServiceImpl();
+            // 1. Setup Controller
+            GameController controller = new GameController();
 
-            // 2. Create a new game model
-            GameModel model = gameService.createNewGame("Anticity");
+            // 2. Start Application (shows menu)
+            controller.start();
 
-            // 3. Setup Controller
-            GameController controller = new GameController(model);
-
-            // 4. Launch View
-            new GameView(controller);
-
-            System.out.println("Game started: Anticity is under your control.");
+            System.out.println("Power Grid Tycoon started.");
         });
     }
 }
