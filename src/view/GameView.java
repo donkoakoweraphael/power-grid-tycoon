@@ -202,7 +202,7 @@ public class GameView extends JFrame implements GameViewObserver {
         JPanel metrics = new JPanel(new GridLayout(5, 1, 0, 12));
         metrics.setOpaque(false);
         metrics.add(createMetricBox("POPULATION", lblPopulation));
-        metrics.add(createMetricBox("MAX CAPACITY", lblTotalCapacity));
+        metrics.add(createMetricBox("DAILY PRODUCTION", lblTotalCapacity));
         metrics.add(createMetricBox("ENERGY STATUS", lblEnergyRatio));
         metrics.add(createMetricBox("PURCHASING POWER", lblPurchasingPower));
         metrics.add(createMetricBox("DAILY CONSUMPTION", lblConsumption));

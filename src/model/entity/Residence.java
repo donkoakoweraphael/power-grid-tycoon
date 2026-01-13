@@ -11,10 +11,10 @@ public class Residence extends Building {
 
     // Level 1 Defaults
     public static final int BASE_MAX_CAPACITY = 20;
-    public static final double BASE_ENERGY_DEMAND_MIN = 0.010; // 10 kWh/day
-    public static final double BASE_ENERGY_DEMAND_MAX = 0.020; // 20 kWh/day
-    public static final double BASE_PURCHASING_POWER_MIN = 8.0; // coins/MWh
-    public static final double BASE_PURCHASING_POWER_MAX = 12.0; // coins/MWh
+    public static final double BASE_ENERGY_DEMAND_MIN = 0.200; // 200 kWh/resident/day
+    public static final double BASE_ENERGY_DEMAND_MAX = 0.500; // 500 kWh/resident/day
+    public static final double BASE_PURCHASING_POWER_MIN = 35.0; // coins/MWh
+    public static final double BASE_PURCHASING_POWER_MAX = 60.0; // coins/MWh
     public static final int DEFAULT_MAX_LEVEL = 5;
 
     // Growth Rates per Level

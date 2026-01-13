@@ -160,6 +160,11 @@ public abstract class PowerPlant extends Building {
         return remainingTime;
     }
 
+    // ========== Shop Metadata ==========
+    public abstract String getShopName();
+
+    public abstract String getShopDescription();
+
     // ========== Setters ==========
 
     public void setStatus(PlantStatus status) {

@@ -73,6 +73,7 @@ public class GameServiceImpl implements GameService {
 
         powerPlantService.prepareNextLevelStats(plant);
         model.notifyObservers();
+        saveGame(model, "autosave");
     }
 
     @Override
@@ -94,6 +95,7 @@ public class GameServiceImpl implements GameService {
             city.setTotalCoins(city.getTotalCoins() - plant.getUpgradeCost());
             powerPlantService.upgradeLevel(plant);
             model.notifyObservers();
+            saveGame(model, "autosave");
             return;
         }
 
@@ -108,6 +110,7 @@ public class GameServiceImpl implements GameService {
             }
             residenceService.upgradeLevel(res);
             model.notifyObservers();
+            saveGame(model, "autosave");
             return;
         }
 
@@ -120,6 +123,7 @@ public class GameServiceImpl implements GameService {
             throw new BusinessRuleException("Price cannot be negative.");
         model.getCity().setElectricityPrice(newPrice);
         model.notifyObservers();
+        saveGame(model, "autosave");
     }
 
     @Override
@@ -135,6 +139,7 @@ public class GameServiceImpl implements GameService {
             plant.setStatus(PlantStatus.ACTIVE);
         }
         model.notifyObservers();
+        saveGame(model, "autosave");
     }
 
     @Override
@@ -143,8 +148,8 @@ public class GameServiceImpl implements GameService {
             throw new BusinessRuleException("Cannot advance day: Game is Over.");
         }
 
-        // Handle Autosave BEFORE simulation to allow recovery from disaster
-        saveGame(model, "autosave");
+        // Rolling Day Save (updated before each day advances)
+        saveGame(model, "day_save");
 
         cityService.simulateDay(model.getCity());
         model.recordDailyStats();
@@ -153,16 +158,10 @@ public class GameServiceImpl implements GameService {
         City city = model.getCity();
         boolean gameOver = false;
 
-        // Conditions:
-        // 1. Happiness too low (<= 5.0)
         if (city.getGlobalHappiness() <= 5.0)
             gameOver = true;
-
-        // 2. Budget below zero
         if (city.getTotalCoins() < 0)
             gameOver = true;
-
-        // 3. Pollution too high (>= 1000)
         if (city.getTotalPollution() >= 1000)
             gameOver = true;
 
@@ -171,6 +170,8 @@ public class GameServiceImpl implements GameService {
         }
 
         model.notifyObservers();
+        // Also autosave current state after simulation
+        saveGame(model, "autosave");
     }
 
     @Override
@@ -184,19 +185,39 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public GameModel createNewGame(String cityName) {
-        City city = new City(cityName, 5000.0); // Starting budget
+        City city = new City();
+        city.setName(cityName);
 
         // Starting infrastructure
         SolarPlant solar = new SolarPlant("solar-start-1");
         solar.setStatus(PlantStatus.ACTIVE);
         city.addPowerPlant(solar);
 
-        // Initial Population: 100 (5 Residences of capacity 20)
-        for (int i = 1; i <= 5; i++) {
+        // Prepare stats for next level (upgrade cost, etc.)
+        powerPlantService.prepareNextLevelStats(solar);
+
+        // Initial Population centered around 100
+        int targetPop = City.INITIAL_POPULATION;
+        int residentsPerHouse = Residence.BASE_MAX_CAPACITY;
+        int housesNeeded = (int) Math.ceil((double) targetPop / residentsPerHouse);
+
+        for (int i = 1; i <= housesNeeded; i++) {
             Residence res = new Residence("res-start-" + i);
-            res.setCurrentOccupancy(20);
+            // Distribute population
+            int popInThisHouse = Math.min(residentsPerHouse, targetPop);
+            res.setCurrentOccupancy(popInThisHouse);
             city.addResidence(res);
+            targetPop -= popInThisHouse;
+
+            // Initialize demand and purchasing power
+            residenceService.regenerateDailyValues(res);
         }
+
+        // Initialize metrics so they are not zero on start
+        cityService.calculateGlobalMetrics(city);
+
+        // Force the starting storage to exactly 50%
+        solar.setCurrentEnergyStored(solar.getStorageCapacity() / 2.0);
 
         GameModel model = new GameModel(city);
         model.recordDailyStats(); // Initial stats

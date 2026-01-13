@@ -46,7 +46,9 @@ public class SaveLoadDialog extends JDialog {
         slotsPanel.setBackground(new Color(30, 30, 30));
         slotsPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        slotsPanel.add(createSlotPanel("autosave", "Auto-Save"));
+        slotsPanel.add(createSlotPanel("autosave", "Quick Auto-Save"));
+        slotsPanel.add(Box.createVerticalStrut(8));
+        slotsPanel.add(createSlotPanel("day_save", "Daily Progress (System)"));
         slotsPanel.add(Box.createVerticalStrut(15));
 
         for (int i = 1; i <= 5; i++) {
@@ -99,7 +101,7 @@ public class SaveLoadDialog extends JDialog {
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         actions.setOpaque(false);
 
-        if (canSave && !id.equals("autosave")) {
+        if (canSave && !id.equals("autosave") && !id.equals("day_save")) {
             JButton btnSave = new JButton("SAVE");
             btnSave.addActionListener(e -> {
                 controller.handleSave(id);
