@@ -12,6 +12,8 @@ public class WindPlant extends PowerPlant {
     // ========== Class Variables (Static) ==========
 
     // Construction
+    public static final String DISPLAY_NAME = "WIND ENERGY FARM";
+    public static final String DESCRIPTION = "Green energy, high storage.";
     public static final double BASE_CONSTRUCTION_COST = 1200.0;
     public static final int BASE_CONSTRUCTION_TIME = 1;
     public static final int DEFAULT_MAX_LEVEL = 4;
@@ -42,6 +44,16 @@ public class WindPlant extends PowerPlant {
      */
     public WindPlant(String id) {
         super(id, BASE_POWER_OUTPUT, BASE_STORAGE_CAPACITY, BASE_DAILY_COST,
-                BASE_POLLUTION_RATE, BASE_CONSTRUCTION_TIME, DEFAULT_MAX_LEVEL);
+                BASE_POLLUTION_RATE, BASE_CONSTRUCTION_COST, BASE_CONSTRUCTION_TIME, DEFAULT_MAX_LEVEL);
+    }
+
+    @Override
+    public String getShopName() {
+        return DISPLAY_NAME;
+    }
+
+    @Override
+    public String getShopDescription() {
+        return DESCRIPTION;
     }
 }

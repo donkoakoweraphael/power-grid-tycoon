@@ -1,5 +1,7 @@
 package model.entity;
 
+import model.enums.PlantStatus;
+
 /**
  * Abstract base class representing a power plant in the game.
  * All specific power plant types inherit from this class.
@@ -39,6 +41,11 @@ public abstract class PowerPlant extends Building {
      * Current operational status of the power plant.
      */
     private PlantStatus status;
+
+    /**
+     * Initial construction cost in coins.
+     */
+    private double constructionCost;
 
     /**
      * Current power output in MW per day.
@@ -94,10 +101,11 @@ public abstract class PowerPlant extends Building {
      * @param maxLevel            Maximum level for this plant
      */
     protected PowerPlant(String id, double basePowerOutput, double baseStorageCapacity,
-            double baseDailyCost, double basePollutionRate,
+            double baseDailyCost, double basePollutionRate, double constructionCost,
             int constructionTime, int maxLevel) {
         super(id, maxLevel);
         this.status = PlantStatus.UNDER_CONSTRUCTION;
+        this.constructionCost = constructionCost;
         this.powerOutput = basePowerOutput;
         this.storageCapacity = baseStorageCapacity;
         this.currentEnergyStored = 0.0;
@@ -144,9 +152,18 @@ public abstract class PowerPlant extends Building {
         return upgradeTime;
     }
 
+    public double getConstructionCost() {
+        return constructionCost;
+    }
+
     public int getRemainingTime() {
         return remainingTime;
     }
+
+    // ========== Shop Metadata ==========
+    public abstract String getShopName();
+
+    public abstract String getShopDescription();
 
     // ========== Setters ==========
 

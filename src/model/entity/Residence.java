@@ -11,16 +11,23 @@ public class Residence extends Building {
 
     // Level 1 Defaults
     public static final int BASE_MAX_CAPACITY = 20;
-    public static final double BASE_ENERGY_DEMAND_MIN = 0.010; // 10 kWh/day
-    public static final double BASE_ENERGY_DEMAND_MAX = 0.020; // 20 kWh/day
-    public static final double BASE_PURCHASING_POWER_MIN = 8.0; // coins/MWh
-    public static final double BASE_PURCHASING_POWER_MAX = 12.0; // coins/MWh
+    public static final double BASE_ENERGY_DEMAND_MIN = 0.200; // 200 kWh/resident/day
+    public static final double BASE_ENERGY_DEMAND_MAX = 0.500; // 500 kWh/resident/day
+    public static final double BASE_PURCHASING_POWER_MIN = 35.0; // coins/MWh
+    public static final double BASE_PURCHASING_POWER_MAX = 60.0; // coins/MWh
     public static final int DEFAULT_MAX_LEVEL = 5;
 
     // Growth Rates per Level
     public static final double CAPACITY_GROWTH_RATE = 1.5; // +50% capacity/level
     public static final double DEMAND_GROWTH_RATE = 1.1; // +10% demand/level
     public static final double PURCHASING_POWER_GROWTH_RATE = 1.15; // +15% purchasing power/level
+
+    // Population Dynamics
+    public static final int GROWTH_CYCLE_DAYS = 7;
+    public static final double MIN_GROWTH_RATE = 0.02; // 2%
+    public static final double MAX_GROWTH_RATE = 0.10; // 10%
+    public static final double MIN_DECAY_RATE = 0.05; // 5%
+    public static final double MAX_DECAY_RATE = 0.15; // 15%
 
     // ========== Instance Variables ==========
 
@@ -50,8 +57,6 @@ public class Residence extends Building {
         this.maxCapacity = BASE_MAX_CAPACITY;
         this.currentOccupancy = 0;
         this.isSupplied = true; // Default to true until first check
-
-        regenerateRandomValues(); // Initialize random demand/power
     }
 
     // ========== Getters ==========
@@ -153,22 +158,4 @@ public class Residence extends Building {
                 '}';
     }
 
-    // ========== Fluctuation Methods ==========
-
-    /**
-     * Regenerates random values for energy demand and purchasing power
-     * within the bounds defined by the current level.
-     */
-    public void regenerateRandomValues() {
-        // Calculate bounds based on level and store in attributes
-        this.energyDemandMin = BASE_ENERGY_DEMAND_MIN * Math.pow(DEMAND_GROWTH_RATE, level - 1);
-        this.energyDemandMax = BASE_ENERGY_DEMAND_MAX * Math.pow(DEMAND_GROWTH_RATE, level - 1);
-
-        this.purchasingPowerMin = BASE_PURCHASING_POWER_MIN * Math.pow(PURCHASING_POWER_GROWTH_RATE, level - 1);
-        this.purchasingPowerMax = BASE_PURCHASING_POWER_MAX * Math.pow(PURCHASING_POWER_GROWTH_RATE, level - 1);
-
-        // Randomize within bounds using Math.random()
-        this.energyDemand = energyDemandMin + (energyDemandMax - energyDemandMin) * Math.random();
-        this.purchasingPower = purchasingPowerMin + (purchasingPowerMax - purchasingPowerMin) * Math.random();
-    }
 }

@@ -1,11 +1,20 @@
 package service.impl;
 
-import model.entity.City;
-import model.entity.PowerPlant;
+import model.enums.GameState;
+import model.enums.PlantStatus;
+import model.entity.*;
+import model.entity.plant.*;
 import service.CityService;
 import service.GameService;
 import service.PowerPlantService;
+import service.PersistenceService;
 import service.ResidenceService;
+import exception.InsufficientFundsException;
+import exception.BusinessRuleException;
+import model.GameModel;
+import service.dto.SaveMetadata;
+
+import java.util.Optional;
 
 /**
  * Implementation of the GameService.
@@ -16,36 +25,239 @@ public class GameServiceImpl implements GameService {
     private final CityService cityService;
     private final PowerPlantService powerPlantService;
     private final ResidenceService residenceService;
+    private PersistenceService persistenceService; // Injected later or default
 
-    public GameServiceImpl(CityService cityService, PowerPlantService powerPlantService,
-            ResidenceService residenceService) {
-        this.cityService = cityService;
-        this.powerPlantService = powerPlantService;
-        this.residenceService = residenceService;
+    public GameServiceImpl() {
+        this.cityService = new CityServiceImpl();
+        this.powerPlantService = new PowerPlantServiceImpl();
+        this.residenceService = new ResidenceServiceImpl();
+        this.persistenceService = new PersistenceServiceImpl();
     }
 
     @Override
-    public void buyPowerPlant(City city, String type, String id) {
-        // Business logic for buying a plant
+    public void buyPowerPlant(GameModel model, String type, String id) {
+        City city = model.getCity();
+        PowerPlant plant;
+        switch (type.toLowerCase()) {
+            case "coal":
+                plant = new CoalPlant(id);
+                break;
+            case "gas":
+                plant = new NaturalGasPlant(id);
+                break;
+            case "solar":
+                plant = new SolarPlant(id);
+                break;
+            case "wind":
+                plant = new WindPlant(id);
+                break;
+            case "nuclear":
+                plant = new NuclearPlant(id);
+                break;
+            case "hydro":
+                plant = new HydroPlant(id);
+                break;
+            case "battery":
+                plant = new BatteryStorage(id);
+                break;
+            default:
+                throw new BusinessRuleException("Unknown power plant type: " + type);
+        }
+
+        if (city.getTotalCoins() < plant.getConstructionCost()) {
+            throw new InsufficientFundsException(plant.getConstructionCost(), city.getTotalCoins());
+        }
+
+        city.setTotalCoins(city.getTotalCoins() - plant.getConstructionCost());
+        city.addPowerPlant(plant);
+
+        powerPlantService.prepareNextLevelStats(plant);
+        model.notifyObservers();
+        saveGame(model, "autosave");
     }
 
     @Override
-    public void upgradeBuilding(City city, String buildingId) {
-        // Logic for checking money and starting upgrade
+    public void upgradeBuilding(GameModel model, String buildingId) {
+        City city = model.getCity();
+        // Search in PowerPlants
+        Optional<PowerPlant> plantOpt = city.getPowerPlants().stream()
+                .filter(p -> p.getId().equals(buildingId)).findFirst();
+
+        if (plantOpt.isPresent()) {
+            PowerPlant plant = plantOpt.get();
+            if (plant.getLevel() >= plant.getMaxLevel()) {
+                throw new BusinessRuleException("Power plant already at maximum level.");
+            }
+            if (city.getTotalCoins() < plant.getUpgradeCost()) {
+                throw new InsufficientFundsException(plant.getUpgradeCost(), city.getTotalCoins());
+            }
+
+            city.setTotalCoins(city.getTotalCoins() - plant.getUpgradeCost());
+            powerPlantService.upgradeLevel(plant);
+            model.notifyObservers();
+            saveGame(model, "autosave");
+            return;
+        }
+
+        // Search in Residences
+        Optional<Residence> resOpt = city.getResidences().stream()
+                .filter(r -> r.getId().equals(buildingId)).findFirst();
+
+        if (resOpt.isPresent()) {
+            Residence res = resOpt.get();
+            if (res.getLevel() >= res.getMaxLevel()) {
+                throw new BusinessRuleException("Residence already at maximum level.");
+            }
+            residenceService.upgradeLevel(res);
+            model.notifyObservers();
+            saveGame(model, "autosave");
+            return;
+        }
+
+        throw new BusinessRuleException("Building not found: " + buildingId);
     }
 
     @Override
-    public void setElectricityPrice(City city, double newPrice) {
-        city.setElectricityPrice(newPrice);
+    public void setElectricityPrice(GameModel model, double newPrice) {
+        if (newPrice < 0)
+            throw new BusinessRuleException("Price cannot be negative.");
+        model.getCity().setElectricityPrice(newPrice);
+        model.notifyObservers();
+        saveGame(model, "autosave");
     }
 
     @Override
-    public void togglePlantStatus(PowerPlant plant) {
-        // Logic for activating/deactivating
+    public void togglePlantStatus(GameModel model, PowerPlant plant) {
+        if (plant.getStatus() == PlantStatus.UNDER_CONSTRUCTION || plant.getStatus() == PlantStatus.UPGRADING) {
+            throw new BusinessRuleException(
+                    "Cannot toggle status while the plant is under construction or being upgraded.");
+        }
+
+        if (plant.getStatus() == PlantStatus.ACTIVE) {
+            plant.setStatus(PlantStatus.INACTIVE);
+        } else {
+            plant.setStatus(PlantStatus.ACTIVE);
+        }
+        model.notifyObservers();
+        saveGame(model, "autosave");
     }
 
     @Override
-    public void nextDay(City city) {
-        // Logic to trigger the simulation cycle
+    public void nextDay(GameModel model) {
+        if (model.getState() == GameState.GAME_OVER) {
+            throw new BusinessRuleException("Cannot advance day: Game is Over.");
+        }
+
+        // Rolling Day Save (updated before each day advances)
+        saveGame(model, "day_save");
+
+        cityService.simulateDay(model.getCity());
+        model.recordDailyStats();
+
+        // Check for Game Over
+        City city = model.getCity();
+        boolean gameOver = false;
+
+        if (city.getGlobalHappiness() <= 5.0)
+            gameOver = true;
+        if (city.getTotalCoins() < 0)
+            gameOver = true;
+        if (city.getTotalPollution() >= 1000)
+            gameOver = true;
+
+        if (gameOver) {
+            model.setState(GameState.GAME_OVER);
+        }
+
+        model.notifyObservers();
+        // Also autosave current state after simulation
+        saveGame(model, "autosave");
+    }
+
+    @Override
+    public void nextDays(GameModel model, int days) {
+        for (int i = 0; i < days; i++) {
+            if (model.getState() == GameState.GAME_OVER)
+                break;
+            nextDay(model);
+        }
+    }
+
+    @Override
+    public GameModel createNewGame(String cityName) {
+        City city = new City();
+        city.setName(cityName);
+
+        // Starting infrastructure
+        SolarPlant solar = new SolarPlant("solar-start-1");
+        solar.setStatus(PlantStatus.ACTIVE);
+        city.addPowerPlant(solar);
+
+        // Prepare stats for next level (upgrade cost, etc.)
+        powerPlantService.prepareNextLevelStats(solar);
+
+        // Initial Population centered around 100
+        int targetPop = City.INITIAL_POPULATION;
+        int residentsPerHouse = Residence.BASE_MAX_CAPACITY;
+        int housesNeeded = (int) Math.ceil((double) targetPop / residentsPerHouse);
+
+        for (int i = 1; i <= housesNeeded; i++) {
+            Residence res = new Residence("res-start-" + i);
+            // Distribute population
+            int popInThisHouse = Math.min(residentsPerHouse, targetPop);
+            res.setCurrentOccupancy(popInThisHouse);
+            city.addResidence(res);
+            targetPop -= popInThisHouse;
+
+            // Initialize demand and purchasing power
+            residenceService.regenerateDailyValues(res);
+        }
+
+        // Initialize metrics so they are not zero on start
+        cityService.calculateGlobalMetrics(city);
+
+        // Force the starting storage to exactly 50%
+        solar.setCurrentEnergyStored(solar.getStorageCapacity() / 2.0);
+
+        GameModel model = new GameModel(city);
+        model.recordDailyStats(); // Initial stats
+
+        // Immediate Autosave
+        saveGame(model, "autosave");
+
+        return model;
+    }
+
+    @Override
+    public void saveGame(GameModel model, String fileName) {
+        if (persistenceService != null) {
+            persistenceService.save(model, fileName);
+        }
+    }
+
+    @Override
+    public GameModel loadGame(String fileName) {
+        if (persistenceService != null) {
+            return persistenceService.load(fileName);
+        }
+        return null;
+    }
+
+    @Override
+    public SaveMetadata getSaveMetadata(String fileName) {
+        if (persistenceService == null || !persistenceService.exists(fileName)) {
+            return new SaveMetadata("", 0, 0, false);
+        }
+
+        GameModel loadedModel = persistenceService.load(fileName);
+        if (loadedModel == null) {
+            return new SaveMetadata("", 0, 0, false);
+        }
+
+        return new SaveMetadata(
+                loadedModel.getCity().getName(),
+                loadedModel.getCity().getCurrentDay(),
+                loadedModel.getCity().getTotalCoins(),
+                true);
     }
 }

@@ -1,5 +1,6 @@
 package model.entity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +9,19 @@ import java.util.List;
  * Manages buildings, economy, and global metrics.
  * Acts as a data container for city state.
  */
-public class City {
+public class City implements Serializable {
+
+    // Simulation Constants
+    public static final double POLLUTION_DISSIPATION_RATE = 0.05; // 5% per day
+    public static final double SATURATION_THRESHOLD_DENSIFY = 0.90; // 90% full
+    public static final double SATURATION_THRESHOLD_EXPAND = 0.95; // 95% full
+    public static final double HAPPINESS_THRESHOLD_GROWTH = 70.0;
+    public static final double HAPPINESS_THRESHOLD_DECAY = 40.0;
+
+    // Initial Values
+    public static final double INITIAL_COINS = 5000.0;
+    public static final int INITIAL_POPULATION = 100;
+    public static final double DEFAULT_ELECTRICITY_PRICE = 12.0;
 
     private String name;
     private int currentDay;
@@ -29,7 +42,14 @@ public class City {
     private List<Residence> residences;
 
     /**
-     * Constructor for City.
+     * Default constructor for City.
+     */
+    public City() {
+        this("New City", INITIAL_COINS);
+    }
+
+    /**
+     * Constructor for City with name and coins.
      * 
      * @param name         Name of the city
      * @param initialCoins Starting budget
@@ -38,10 +58,10 @@ public class City {
         this.name = name;
         this.totalCoins = initialCoins;
         this.currentDay = 1;
-        this.electricityPrice = 12.0; // Default price (coins/MWh)
+        this.electricityPrice = DEFAULT_ELECTRICITY_PRICE;
 
         this.globalHappiness = 100.0;
-        this.totalPopulation = 0;
+        this.totalPopulation = 0; // Will be populated by createNewGame logic
         this.totalPollution = 0.0;
 
         this.powerPlants = new ArrayList<>();
