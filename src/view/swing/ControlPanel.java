@@ -26,16 +26,38 @@ public class ControlPanel extends JPanel {
                 BorderFactory.createMatteBorder(2, 0, 0, 0, new Color(200, 200, 200)),
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)));
 
+        // Ensure the panel has enough height and isn't crushed
+        setPreferredSize(new Dimension(1000, 90));
+
         Font buttonFont = new Font("Segoe UI", Font.BOLD, 12);
 
-        // 1. Bouton HEURE SUIVANTE
-        JButton nextBtn = createStyledButton("> Heure Suivante", new Color(76, 175, 80));
+        // 1. Bouton HEURE SUIVANTE + Spinner
+        JPanel timePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        timePanel.setOpaque(false);
+
+        JButton nextBtn = createStyledButton("> Avancer", new Color(76, 175, 80));
+        nextBtn.setPreferredSize(new Dimension(110, 40)); // Slightly smaller to fit spinner
         nextBtn.setFont(buttonFont);
+
+        // Spinner for hours
+        SpinnerNumberModel spinnerModel = new SpinnerNumberModel(1, 1, 168, 1); // 1h to 1 week
+        JSpinner hourSpinner = new JSpinner(spinnerModel);
+        hourSpinner.setPreferredSize(new Dimension(50, 40));
+        hourSpinner.setToolTipText("Heures à passer par clic");
+        ((JSpinner.DefaultEditor) hourSpinner.getEditor()).getTextField().setEditable(false); // Read only text
+
         nextBtn.addActionListener(e -> {
-            controller.handleNextDay();
+            int hours = (Integer) hourSpinner.getValue();
+            controller.handleNextHours(hours);
             frame.refresh();
         });
-        add(nextBtn);
+
+        timePanel.add(nextBtn);
+        timePanel.add(new JLabel("x")); // Visual multiplier indicator
+        timePanel.add(hourSpinner);
+        timePanel.add(new JLabel("h"));
+
+        add(timePanel);
 
         add(Box.createHorizontalStrut(20)); // Separator
 
@@ -57,6 +79,8 @@ public class ControlPanel extends JPanel {
         // 3. CONTROLE DE PRIX (Inline)
         JPanel pricePanel = createPriceControlPanel();
         add(pricePanel);
+
+        update(); // Force initial update to display correct price (e.g. 12.0 instead of 0.0)
     }
 
     private void toggleMoveMode() {
@@ -114,6 +138,8 @@ public class ControlPanel extends JPanel {
         btn.setFocusPainted(false);
         btn.setBorderPainted(false);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setOpaque(true);
+        btn.setContentAreaFilled(true);
     }
 
     private void updatePrice(double delta) {

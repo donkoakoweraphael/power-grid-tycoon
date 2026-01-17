@@ -298,6 +298,26 @@ public class InfoPanel extends JPanel {
         btn.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         btn.addActionListener(e -> {
+            if (b instanceof PowerPlant) {
+                PowerPlant p = (PowerPlant) b;
+                double nextOutput = p.getPowerOutput() * p.getPowerOutputGrowthRate();
+                double nextStorage = p.getStorageCapacity() * p.getStorageGrowthRate();
+
+                String message = String.format("<html><b>Coût:</b> %.0f 🪙<br><br>" +
+                        "<b>Production:</b> %.1f MW ➝ <span style='color:green'>%.1f MW</span><br>" +
+                        "<b>Stockage:</b> %.0f MWh ➝ <span style='color:blue'>%.0f MWh</span><br><br>" +
+                        "Voulez-vous confirmer l'amélioration ?</html>",
+                        cost, p.getPowerOutput(), nextOutput,
+                        p.getCurrentEnergyStored(), nextStorage); // Note: Showing Capacity change is better usually,
+                                                                  // but stored is fine context
+
+                int response = JOptionPane.showConfirmDialog(frame, message, "Confirmer l'amélioration",
+                        JOptionPane.YES_NO_OPTION);
+                if (response != JOptionPane.YES_OPTION) {
+                    return;
+                }
+            }
+
             try {
                 controller.handleUpgradeBuilding(b.getId());
                 frame.refresh();

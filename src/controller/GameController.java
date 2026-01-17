@@ -83,6 +83,13 @@ public class GameController {
         printStatus();
     }
 
+    public void handleNextHours(int hours) {
+        for (int i = 0; i < hours; i++) {
+            gameService.nextDay(model);
+        }
+        printStatus();
+    }
+
     public void handleBuyPlant(String type, String id, int x, int y) throws Exception {
         gameService.buyPowerPlant(model, type, id, x, y);
         System.out.println("Construction: " + type + " en (" + x + "," + y + ")");

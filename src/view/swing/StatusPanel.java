@@ -166,7 +166,7 @@ public class StatusPanel extends JPanel {
 
         // Purchasing Power Label
         double avgPP = model.getCity().getAvgPurchasingPower();
-        ppLabel.setText(String.format("Salaires : 🪙 %.0f", avgPP));
+        ppLabel.setText(String.format("P. Achat Moy. : 🪙 %.0f", avgPP));
     }
 
     public void setModel(GameModel model) {

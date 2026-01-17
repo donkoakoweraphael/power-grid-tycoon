@@ -208,6 +208,48 @@ public class GridPanel extends JPanel {
                 }
             }
         }
+        // Dessiner le highlight de survol (Construction / Deplacement)
+        if (hoverCell != null && (pendingBuildingType != null || isMoveMode)) {
+            drawHighlight(g2d, hoverCell.x, hoverCell.y, LABEL_OFFSET);
+        }
+    }
+
+    private void drawHighlight(Graphics2D g2d, int x, int y, int offset) {
+        int px = offset + x * CELL_SIZE;
+        int py = offset + y * CELL_SIZE;
+
+        boolean isOccupied = model.getCity().isCellOccupied(x, y);
+        Color highlightColor = null;
+
+        if (pendingBuildingType != null) {
+            // MODE CONSTRUCTION
+            // Libre = Vert, Occupe = Rouge
+            highlightColor = !isOccupied ? new Color(76, 175, 80, 150) : new Color(244, 67, 54, 150);
+        } else if (isMoveMode) {
+            // MODE DEPLACEMENT
+            if (moveSource == null) {
+                // Etape 1 : Selection du batiment source
+                // Occupe = Bleu (Selectionnable), Vide = Rien/Gris
+                if (isOccupied) {
+                    highlightColor = new Color(33, 150, 243, 150); // Blue for "Pick me"
+                }
+            } else {
+                // Etape 2 : Selection de la destination
+                // Libre = Vert, Occupe = Rouge
+                highlightColor = !isOccupied ? new Color(76, 175, 80, 150) : new Color(244, 67, 54, 150);
+            }
+        }
+
+        if (highlightColor != null) {
+            g2d.setColor(highlightColor);
+            g2d.fillRect(px, py, CELL_SIZE, CELL_SIZE);
+
+            // Border for extra visibility
+            g2d.setColor(highlightColor.darker());
+            g2d.setStroke(new BasicStroke(3));
+            g2d.drawRect(px + 1, py + 1, CELL_SIZE - 2, CELL_SIZE - 2);
+            g2d.setStroke(new BasicStroke(1));
+        }
     }
 
     private void drawBuilding(Graphics2D g2d, Building b, int x, int y, int offset) {
@@ -221,11 +263,11 @@ public class GridPanel extends JPanel {
         if (b instanceof PowerPlant) {
             baseColor = new Color(255, 193, 7); // Amber
             accentColor = new Color(255, 152, 0); // Orange
-            label = "P" + b.getLevel();
+            label = b.getGridCode() + "-" + b.getLevel();
         } else if (b instanceof Residence) {
             baseColor = new Color(121, 85, 72); // Brown
             accentColor = new Color(93, 64, 55); // Dark brown
-            label = "H" + b.getLevel();
+            label = "H-" + b.getLevel(); // Residence might not have grid code yet, checking Building.java
         } else {
             baseColor = Color.GRAY;
             accentColor = Color.DARK_GRAY;

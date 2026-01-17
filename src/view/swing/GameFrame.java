@@ -98,7 +98,8 @@ public class GameFrame extends JFrame implements GameViewObserver {
         add(infoPanel, BorderLayout.EAST);
         add(controlPanel, BorderLayout.SOUTH);
 
-        setPreferredSize(new Dimension(1200, 800));
+        // Increased size for better menu visibility
+        setPreferredSize(new Dimension(1400, 900));
         pack();
         setLocationRelativeTo(null);
 

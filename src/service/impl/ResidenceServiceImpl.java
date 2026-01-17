@@ -28,13 +28,13 @@ public class ResidenceServiceImpl implements ResidenceService {
 
         // Randomize within bounds
         double baseDemand = demandMin + (demandMax - demandMin) * Math.random();
-        
+
         // Multiply by 10 for better game balance (houses need ~0.5 MW each)
         baseDemand *= 10.0;
-        
+
         // Add User's "Chaos Factor" (+/- 5 variance?)
         double variance = (Math.random() * 10.0) - 5.0; // [-5, +5]
-        
+
         // Ensure demand doesn't go negative
         residence.setEnergyDemand(Math.max(0.1, baseDemand + (variance * 0.001)));
 
@@ -52,18 +52,47 @@ public class ResidenceServiceImpl implements ResidenceService {
         int current = residence.getCurrentOccupancy();
         int max = residence.getMaxCapacity();
 
+        // 1. High Happiness (> 70) -> Hyper Growth (20% - 50% of Max Capacity)
         if (happiness > model.entity.City.HAPPINESS_THRESHOLD_GROWTH && current < max) {
-            // Growth
-            double rate = Residence.MIN_GROWTH_RATE
-                    + (Residence.MAX_GROWTH_RATE - Residence.MIN_GROWTH_RATE) * Math.random();
-            int moveIn = (int) (max * rate) + 1;
+            double rate = 0.20 + (0.50 - 0.20) * Math.random(); // 20% to 50%
+            int moveIn = (int) (max * rate);
+
+            // Ensure at least 5 people move in for massive growth
+            if (moveIn < 5)
+                moveIn = 5;
+
             residence.setCurrentOccupancy(Math.min(max, current + moveIn));
-        } else if (happiness < model.entity.City.HAPPINESS_THRESHOLD_DECAY && current > 0) {
-            // Decay
-            double rate = Residence.MIN_DECAY_RATE
-                    + (Residence.MAX_DECAY_RATE - Residence.MIN_DECAY_RATE) * Math.random();
-            int leave = (int) (current * rate) + 1;
+        }
+        // 2. Low Happiness (< 40) -> Hyper Decay (20% - 50% of Current Population)
+        else if (happiness < model.entity.City.HAPPINESS_THRESHOLD_DECAY && current > 0) {
+            double rate = 0.20 + (0.50 - 0.20) * Math.random(); // 20% to 50%
+            int leave = (int) (current * rate);
+
+            // Ensure at least 5 people leave
+            if (leave < 5)
+                leave = 5;
+
             residence.setCurrentOccupancy(Math.max(0, current - leave));
+        }
+        // 3. Average Happiness (40-70) -> High Fluctuation (10% - 20% of Current
+        // Population)
+        else {
+            if (current > 0 && current < max) {
+                double rate = 0.10 + (0.20 - 0.10) * Math.random(); // 10% to 20%
+                int change = (int) (current * rate);
+
+                // Ensure at least 2 person flux
+                if (change < 2)
+                    change = 2;
+
+                // Random Direction (50/50)
+                if (Math.random() < 0.5) {
+                    change = -change; // Leave
+                }
+
+                int newVal = current + change;
+                residence.setCurrentOccupancy(Math.max(0, Math.min(max, newVal)));
+            }
         }
     }
 

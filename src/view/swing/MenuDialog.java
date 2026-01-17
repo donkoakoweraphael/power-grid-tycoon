@@ -23,7 +23,7 @@ public class MenuDialog extends JDialog {
     }
 
     private void setupDialog() {
-        setSize(300, 350);
+        setSize(350, 450);
         setLocationRelativeTo(frame);
         getContentPane().setBackground(new Color(250, 250, 250));
         setLayout(new BorderLayout(10, 10));

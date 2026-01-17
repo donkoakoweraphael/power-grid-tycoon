@@ -299,4 +299,22 @@ public class City implements Serializable {
                 .mapToInt(Residence::getMaxCapacity)
                 .sum();
     }
+
+    // ========== Serialization Safety ==========
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        // Fix for legacy saves or uninitialized price
+        if (this.electricityPrice <= 0.001) {
+            this.electricityPrice = DEFAULT_ELECTRICITY_PRICE;
+        }
+        // Ensure lists are not null (extra safety)
+        if (this.profitHistory == null)
+            this.profitHistory = new ArrayList<>();
+        if (this.eventLog == null)
+            this.eventLog = new ArrayList<>();
+        if (this.powerPlants == null)
+            this.powerPlants = new ArrayList<>();
+        if (this.residences == null)
+            this.residences = new ArrayList<>();
+    }
 }

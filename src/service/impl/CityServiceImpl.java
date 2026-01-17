@@ -52,23 +52,18 @@ public class CityServiceImpl implements CityService {
         // Fluctuations (New day base values)
         city.getResidences().forEach(residenceService::regenerateDailyValues);
 
-        // Urban expansion every day (User request: was 7 days)
-        // No need for modulo check if it's every day, or strictly check == 1 day if we
-        // want it every day?
-        // Since performDailyTasks runs once per day, we just call manageUrbanExpansion
-        // directly.
+        // Daily Population Update (Growth/Decay)
+        city.getResidences().forEach(r -> residenceService.updateOccupancy(r, city.getGlobalHappiness()));
+
+        // Urban expansion every day
         manageUrbanExpansion(city);
     }
 
     @Override
     public void calculateGlobalMetrics(City city) {
         int population = city.getResidences().stream()
-                .mapToInt(r -> {
-                    if (city.getCurrentDay() % model.entity.Residence.GROWTH_CYCLE_DAYS == 0) {
-                        residenceService.updateOccupancy(r, city.getGlobalHappiness());
-                    }
-                    return r.getCurrentOccupancy();
-                }).sum();
+                .mapToInt(model.entity.Residence::getCurrentOccupancy)
+                .sum();
 
         double demand = city.getResidences().stream()
                 .mapToDouble(r -> {
@@ -274,34 +269,80 @@ public class CityServiceImpl implements CityService {
 
     @Override
     public void manageUrbanExpansion(City city) {
-        int totalCapacity = city.getResidences().stream()
-                .mapToInt(model.entity.Residence::getMaxCapacity).sum();
+        int maxIterations = 50; // Safety break
+        int iterations = 0;
 
-        // If city is nearly full and people are happy, expand
-        if (city.getTotalPopulation() >= totalCapacity * City.SATURATION_THRESHOLD_DENSIFY
-                && city.getGlobalHappiness() > City.HAPPINESS_THRESHOLD_GROWTH) {
+        while (city.getTotalPopulation() >= city.getTotalHousingCapacity() * 0.95 && iterations < maxIterations) {
+            iterations++;
+            boolean capacityChanged = false;
 
-            // Phase 1: Try upgrading existing residences (Densification)
-            for (model.entity.Residence r : city.getResidences()) {
-                if (r.getLevel() < r.getMaxLevel()) {
-                    residenceService.upgradeLevel(r);
-                    // Check if we gained enough capacity (just densify one by one for balance)
+            // Decision: Build (0) vs Upgrade (1)
+            boolean tryBuild = Math.random() < 0.5;
+
+            if (tryBuild) {
+                if (tryBuildNewResidence(city)) {
+                    capacityChanged = true;
+                } else {
+                    // Fallback to upgrade if build failed (e.g., grid full)
+                    if (tryUpgradeExistingResidence(city)) {
+                        capacityChanged = true;
+                    }
+                }
+            } else {
+                if (tryUpgradeExistingResidence(city)) {
+                    capacityChanged = true;
+                } else {
+                    // Fallback to build if upgrade failed (e.g., all max level)
+                    if (tryBuildNewResidence(city)) {
+                        capacityChanged = true;
+                    }
                 }
             }
 
-            // Re-calculate capacity after densification
-            int newTotalCapacity = city.getResidences().stream()
-                    .mapToInt(model.entity.Residence::getMaxCapacity).sum();
+            // If we couldn't do anything, stop trying
+            if (!capacityChanged) {
+                break;
+            }
+        }
+    }
 
-            // Phase 2: Build new residences if still tight
-            if (city.getTotalPopulation() >= newTotalCapacity * City.SATURATION_THRESHOLD_EXPAND) {
-                int countToBuild = 2; // Build 2 new residences per expansion phase
-                for (int i = 0; i < countToBuild; i++) {
-                    String id = "res-" + city.getResidences().size() + "-" + city.getCurrentDay();
-                    city.addResidence(new model.entity.Residence(id));
+    private boolean tryBuildNewResidence(City city) {
+        // Find empty spot
+        for (int x = 0; x < city.getWidth(); x++) {
+            for (int y = 0; y < city.getHeight(); y++) {
+                if (!city.isCellOccupied(x, y)) {
+                    String id = "res-" + city.getResidences().size() + "-" + city.getCurrentDay() + "-"
+                            + (int) (Math.random() * 1000);
+                    model.entity.Residence r = new model.entity.Residence(id);
+                    r.setPosition(x, y); // Important: set position before adding/placing
+                    // City.addResidence calls placeOnGrid which uses x,y.
+                    // But Residence constructor doesn't take x,y.
+                    // We must ensure x,y are set.
+                    // Looking at City.java: placeOnGrid uses b.getX().
+                    // So we must set them first.
+                    city.addResidence(r);
+                    return true;
                 }
             }
         }
+        return false;
+    }
+
+    private boolean tryUpgradeExistingResidence(City city) {
+        // Find candidates
+        java.util.List<model.entity.Residence> upgradeable = city.getResidences().stream()
+                .filter(r -> r.getLevel() < r.getMaxLevel())
+                .collect(java.util.stream.Collectors.toList());
+
+        if (upgradeable.isEmpty()) {
+            return false;
+        }
+
+        // Pick one randomly
+        int info = (int) (Math.random() * upgradeable.size());
+        model.entity.Residence r = upgradeable.get(info);
+        residenceService.upgradeLevel(r);
+        return true;
     }
 
     private void handleRandomEvents(City city) {
