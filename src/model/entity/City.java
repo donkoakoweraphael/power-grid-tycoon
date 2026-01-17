@@ -24,8 +24,8 @@ public class City implements Serializable {
     public static final int INITIAL_POPULATION = 100;
     public static final double DEFAULT_ELECTRICITY_PRICE = 12.0;
 
-    public static final int INITIAL_GRID_WIDTH = 30;
-    public static final int INITIAL_GRID_HEIGHT = 15;
+    public static final int GRID_WIDTH = 16;
+    public static final int GRID_HEIGHT = 10;
 
     private String name;
     private int currentDay;
@@ -76,8 +76,8 @@ public class City implements Serializable {
         this.currentDay = 1;
         this.electricityPrice = DEFAULT_ELECTRICITY_PRICE;
 
-        this.width = INITIAL_GRID_WIDTH;
-        this.height = INITIAL_GRID_HEIGHT;
+        this.width = GRID_WIDTH;
+        this.height = GRID_HEIGHT;
         this.grid = new Building[width][height];
 
         this.globalHappiness = 100.0;

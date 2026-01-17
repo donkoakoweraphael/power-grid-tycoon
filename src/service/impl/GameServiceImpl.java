@@ -201,6 +201,28 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
+    public void moveBuilding(GameModel model, int oldX, int oldY, int newX, int newY) {
+        City city = model.getCity();
+
+        if (city.isCellOccupied(newX, newY)) {
+            throw new BusinessRuleException("Cannot move: Target cell (" + newX + "," + newY + ") is occupied.");
+        }
+
+        Building b = city.getGrid()[oldX][oldY];
+        if (b == null) {
+            throw new BusinessRuleException("No building found at (" + oldX + "," + oldY + ").");
+        }
+
+        city.getGrid()[oldX][oldY] = null;
+        city.getGrid()[newX][newY] = b;
+        b.setPosition(newX, newY);
+        city.addEvent("Relocated: " + b.getGridCode() + " -> (" + newX + "," + newY + ")");
+
+        model.notifyObservers();
+        saveGame(model, "autosave");
+    }
+
+    @Override
     public void nextDay(GameModel model) {
         // Rolling Day Save (before simulation, so player can return to start of day)
         saveGame(model, "day_save");

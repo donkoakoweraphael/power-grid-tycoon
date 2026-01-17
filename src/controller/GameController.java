@@ -96,6 +96,10 @@ public class GameController {
         printMap();
     }
 
+    public void handleMoveBuilding(int oldX, int oldY, int newX, int newY) {
+        gameService.moveBuilding(model, oldX, oldY, newX, newY);
+    }
+
     public void handleUpgradeBuilding(String id) {
         try {
             gameService.upgradeBuilding(model, id);

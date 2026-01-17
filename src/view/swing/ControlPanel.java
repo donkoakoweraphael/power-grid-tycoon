@@ -13,6 +13,9 @@ public class ControlPanel extends JPanel {
     private GameFrame frame;
     private JLabel priceValueLabel;
 
+    private JButton moveBtn;
+    private boolean isMoveModeActive = false;
+
     public ControlPanel(GameController controller, GameFrame frame) {
         this.controller = controller;
         this.frame = frame;
@@ -44,9 +47,35 @@ public class ControlPanel extends JPanel {
 
         add(Box.createHorizontalStrut(20)); // Separator
 
+        moveBtn = createStyledButton("Deplacer", new Color(156, 39, 176));
+        moveBtn.setFont(buttonFont);
+        moveBtn.addActionListener(e -> toggleMoveMode());
+        add(moveBtn);
+
+        add(Box.createHorizontalStrut(20)); // Separator
+
         // 3. CONTROLE DE PRIX (Inline)
         JPanel pricePanel = createPriceControlPanel();
         add(pricePanel);
+    }
+
+    private void toggleMoveMode() {
+        if (!isMoveModeActive) {
+            isMoveModeActive = true;
+            moveBtn.setText("Fin Deplacement");
+            moveBtn.setBackground(new Color(255, 200, 200));
+            moveBtn.setBorder(BorderFactory.createMatteBorder(0, 3, 0, 0, Color.RED));
+            frame.startMoveMode();
+        } else {
+            frame.stopMoveMode(); // will trigger onMoveModeEnded
+        }
+    }
+
+    public void onMoveModeEnded() {
+        isMoveModeActive = false;
+        moveBtn.setText("Deplacer");
+        moveBtn.setBackground(Color.WHITE);
+        moveBtn.setBorder(BorderFactory.createMatteBorder(0, 3, 0, 0, new Color(156, 39, 176)));
     }
 
     // ----- Price Control Logic -----
@@ -348,33 +377,8 @@ public class ControlPanel extends JPanel {
     }
 
     private void promptCoordinates(String type, boolean isPowerPlant) {
-        String coords = JOptionPane.showInputDialog(frame, "Entrez les coordonnees (x,y):");
-        if (coords != null && coords.contains(",")) {
-            String[] parts = coords.split(",");
-            try {
-                int x = Integer.parseInt(parts[0].trim());
-                int y = Integer.parseInt(parts[1].trim());
-
-                if (isPowerPlant) {
-                    String id = type + "-" + System.currentTimeMillis();
-                    controller.handleBuyPlant(type, id, x, y);
-                    frame.refresh();
-                    JOptionPane.showMessageDialog(frame,
-                            "Centrale " + type + " construite en (" + x + "," + y + ")",
-                            "Succès",
-                            JOptionPane.INFORMATION_MESSAGE);
-                } else {
-                    controller.handleBuildResidence(x, y);
-                    frame.refresh();
-                    JOptionPane.showMessageDialog(frame,
-                            "Maison construite en (" + x + "," + y + ")",
-                            "Succès",
-                            JOptionPane.INFORMATION_MESSAGE);
-                }
-            } catch (Exception ex) {
-                showError(ex.getMessage());
-            }
-        }
+        // Click-to-Build: Activate construction mode in GameFrame/GridPanel
+        frame.startConstructionMode(type, isPowerPlant);
     }
 
     private void showError(String message) {

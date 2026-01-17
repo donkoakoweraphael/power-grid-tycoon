@@ -176,7 +176,16 @@ public class InfoPanel extends JPanel {
             double upgradeCost = p.getUpgradeCost();
             String upgradeInfo = "";
             if (p.getLevel() < p.getMaxLevel()) {
-                upgradeInfo = String.format("<b>Amelioration:</b> %.0f pieces<br>", upgradeCost);
+                double nextOutput = p.getPowerOutput() * p.getPowerOutputGrowthRate();
+                double nextStorage = p.getStorageCapacity() * p.getStorageGrowthRate();
+                double nextCost = p.getDailyCost() * p.getDailyCostGrowthRate();
+
+                upgradeInfo = String.format("<b>Amelioration:</b> %.0f pieces<br>" +
+                        "<span style='color:%s'>+%.0f MW Output</span><br>" +
+                        "<span style='color:%s'>+%.0f MWh Stock</span>",
+                        upgradeCost,
+                        "#4CAF50", nextOutput - p.getPowerOutput(),
+                        "#2196F3", nextStorage - p.getStorageCapacity());
             } else {
                 upgradeInfo = "<b>Niveau MAX atteint</b><br>";
             }

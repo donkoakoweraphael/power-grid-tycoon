@@ -178,6 +178,62 @@ public class GameFrame extends JFrame implements GameViewObserver {
         infoPanel.showBuildingInfo(b, x, y);
     }
 
+    public void startConstructionMode(String type, boolean isPowerPlant) {
+        gridPanel.startConstructionMode(type, isPowerPlant);
+        javax.swing.JOptionPane.showMessageDialog(this,
+                "Mode Construction Active!\n\nCliquez sur une case LIBRE (verte) pour construire.\nClic-Droit pour annuler.",
+                "Construction", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public void startMoveMode() {
+        gridPanel.startMoveMode();
+    }
+
+    public void stopMoveMode() {
+        gridPanel.cancelConstructionMode();
+    }
+
+    public void notifyMoveModeEnded() {
+        controlPanel.onMoveModeEnded();
+    }
+
+    public void finalizeConstruction(String type, boolean isPowerPlant, int x, int y) {
+        try {
+            if (isPowerPlant) {
+                String id = type + "-" + System.currentTimeMillis();
+                controller.handleBuyPlant(type, id, x, y);
+            } else {
+                controller.handleBuildResidence(x, y);
+            }
+
+            refresh();
+
+            // Auto-select the new building
+            try {
+                Building b = model.getCity().getGrid()[x][y];
+                showBuildingInfo(b, x, y);
+            } catch (Exception ex) {
+                // Ignore selection error
+            }
+
+        } catch (Exception ex) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Erreur: " + ex.getMessage(), "Erreur",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public void finalizeMove(int oldX, int oldY, int newX, int newY) {
+        try {
+            controller.handleMoveBuilding(oldX, oldY, newX, newY);
+            refresh();
+            javax.swing.JOptionPane.showMessageDialog(this, "Batiment deplace avec succes!", "Succes",
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Erreur: " + ex.getMessage(), "Erreur",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
     /**
      * Updates the game model for the whole frame (used when loading a save).
      */

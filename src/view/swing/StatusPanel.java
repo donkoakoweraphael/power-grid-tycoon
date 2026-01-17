@@ -21,6 +21,7 @@ public class StatusPanel extends JPanel {
     private JLabel happinessLabel;
     private JLabel energyLabel;
     private JLabel priceLabel;
+    private JLabel ppLabel;
 
     private javax.swing.Timer clockTimer;
     private int displayMinutes = 0;
@@ -70,6 +71,8 @@ public class StatusPanel extends JPanel {
         happinessLabel.setFont(labelFont);
         energyLabel.setFont(labelFont);
         priceLabel.setFont(labelFont);
+        ppLabel = new JLabel();
+        ppLabel.setFont(labelFont);
 
         add(dayLabel);
         add(createSeparator());
@@ -82,6 +85,8 @@ public class StatusPanel extends JPanel {
         add(energyLabel);
         add(createSeparator());
         add(priceLabel);
+        add(createSeparator());
+        add(ppLabel);
 
         update();
     }
@@ -158,6 +163,10 @@ public class StatusPanel extends JPanel {
 
         // Price Label
         priceLabel.setText(String.format("Prix élec : 🪙 %.2f/kWh", model.getCity().getElectricityPrice()));
+
+        // Purchasing Power Label
+        double avgPP = model.getCity().getAvgPurchasingPower();
+        ppLabel.setText(String.format("Salaires : 🪙 %.0f", avgPP));
     }
 
     public void setModel(GameModel model) {

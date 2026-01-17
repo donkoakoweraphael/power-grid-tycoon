@@ -12,18 +12,25 @@ import model.entity.Residence;
  */
 public class GridPanel extends JPanel {
 
-    private static final int CELL_SIZE = 50;
+    private static final int CELL_SIZE = 75;
     private static final Color GRASS_COLOR = new Color(34, 139, 34);
     private static final Color GRID_COLOR = new Color(0, 100, 0);
 
     private GameModel model;
     private GameFrame frame;
 
+    // Interaction State
+    private String pendingBuildingType = null;
+    private boolean pendingIsPowerPlant = false;
+    private Point hoverCell = null;
+    private boolean isMoveMode = false;
+    private Point moveSource = null;
+
     public GridPanel(GameModel model, GameFrame frame) {
         this.model = model;
         this.frame = frame;
 
-        int LABEL_OFFSET = 25;
+        int LABEL_OFFSET = 30;
         int gridSize = model.getCity().getWidth() * CELL_SIZE + LABEL_OFFSET;
         setPreferredSize(new Dimension(gridSize, gridSize));
         setBackground(Color.BLACK);
@@ -32,17 +39,108 @@ public class GridPanel extends JPanel {
         addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
-                int LABEL_OFFSET = 25;
+                // Right click check first
+                if (isMoveMode || pendingBuildingType != null) {
+                    if (SwingUtilities.isRightMouseButton(e)) {
+                        cancelConstructionMode();
+                        return;
+                    }
+                }
+
+                int LABEL_OFFSET = 30;
                 int gridX = (e.getX() - LABEL_OFFSET) / CELL_SIZE;
                 int gridY = (e.getY() - LABEL_OFFSET) / CELL_SIZE;
 
                 if (gridX >= 0 && gridX < model.getCity().getWidth() &&
                         gridY >= 0 && gridY < model.getCity().getHeight()) {
-                    Building b = model.getCity().getGrid()[gridX][gridY];
-                    frame.showBuildingInfo(b, gridX, gridY);
+
+                    if (pendingBuildingType != null) {
+                        if (!model.getCity().isCellOccupied(gridX, gridY)) {
+                            frame.finalizeConstruction(pendingBuildingType, pendingIsPowerPlant, gridX, gridY);
+                            cancelConstructionMode();
+                        } else {
+                            Toolkit.getDefaultToolkit().beep();
+                        }
+                    } else if (isMoveMode) {
+                        if (moveSource == null) {
+                            if (model.getCity().isCellOccupied(gridX, gridY)) {
+                                moveSource = new Point(gridX, gridY);
+                            } else {
+                                Toolkit.getDefaultToolkit().beep();
+                            }
+                        } else {
+                            if (!model.getCity().isCellOccupied(gridX, gridY)) {
+                                frame.finalizeMove(moveSource.x, moveSource.y, gridX, gridY);
+                                resetMoveSelection();
+                            } else {
+                                Toolkit.getDefaultToolkit().beep();
+                            }
+                        }
+                        repaint();
+                    } else {
+                        Building b = model.getCity().getGrid()[gridX][gridY];
+                        frame.showBuildingInfo(b, gridX, gridY);
+                    }
                 }
             }
         });
+
+        addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(java.awt.event.MouseEvent e) {
+                if (pendingBuildingType != null || isMoveMode) {
+                    int LABEL_OFFSET = 30;
+                    int gridX = (e.getX() - LABEL_OFFSET) / CELL_SIZE;
+                    int gridY = (e.getY() - LABEL_OFFSET) / CELL_SIZE;
+
+                    if (gridX >= 0 && gridX < model.getCity().getWidth() &&
+                            gridY >= 0 && gridY < model.getCity().getHeight()) {
+                        hoverCell = new Point(gridX, gridY);
+                    } else {
+                        hoverCell = null;
+                    }
+                    repaint();
+                }
+            }
+        });
+    }
+
+    public void startConstructionMode(String type, boolean isPowerPlant) {
+        this.pendingBuildingType = type;
+        this.pendingIsPowerPlant = isPowerPlant;
+        this.isMoveMode = false;
+        this.moveSource = null;
+        this.hoverCell = null;
+        setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+        repaint();
+    }
+
+    public void startMoveMode() {
+        this.isMoveMode = true;
+        this.pendingBuildingType = null;
+        this.moveSource = null;
+        this.hoverCell = null;
+        setCursor(new Cursor(Cursor.HAND_CURSOR));
+        JOptionPane.showMessageDialog(frame,
+                "Mode Deplacement Actif!\n1. Choisissez le batiment.\n2. Cliquez sur une case vide.", "Deplacement",
+                JOptionPane.INFORMATION_MESSAGE);
+        repaint();
+    }
+
+    public void resetMoveSelection() {
+        this.moveSource = null;
+        repaint();
+    }
+
+    public void cancelConstructionMode() {
+        this.pendingBuildingType = null;
+        this.isMoveMode = false;
+        this.moveSource = null;
+        this.hoverCell = null;
+        setCursor(Cursor.getDefaultCursor());
+        if (frame != null)
+            frame.notifyMoveModeEnded();
+        repaint();
     }
 
     public void setModel(GameModel model) {
