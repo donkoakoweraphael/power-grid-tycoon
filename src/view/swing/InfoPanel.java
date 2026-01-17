@@ -9,7 +9,7 @@ import model.entity.PowerPlant;
 import model.entity.Residence;
 
 /**
- * Modern information panel with card-based design.
+ * Panneau d'informations moderne avec design en cartes.
  */
 public class InfoPanel extends JPanel {
     
@@ -32,12 +32,12 @@ public class InfoPanel extends JPanel {
         setBackground(BG_COLOR);
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         
-        // Event log card
+        // Carte du journal des evenements
         eventCard = createCard("Evenements Recents");
         add(eventCard);
         add(Box.createVerticalStrut(15));
         
-        // Building info card
+        // Carte d'info du batiment
         buildingCard = createCard("Details du Batiment");
         add(buildingCard);
         add(Box.createVerticalGlue());
@@ -106,7 +106,7 @@ public class InfoPanel extends JPanel {
         item.setBorder(BorderFactory.createEmptyBorder(8, 10, 8, 10));
         item.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
         
-        // Icon based on event type
+        // Icone selon le type d'evenement
         String icon = "•";
         Color iconColor = ACCENT_COLOR;
         if (event.contains("FIRE") || event.contains("STORM") || event.contains("EARTHQUAKE") || event.contains("TORNADO")) {

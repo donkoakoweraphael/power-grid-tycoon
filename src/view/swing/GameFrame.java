@@ -8,8 +8,8 @@ import model.enums.GameState;
 import model.entity.Building;
 
 /**
- * Main Swing window for Power Grid Tycoon.
- * Minimal UI inspired by Universal Paperclips.
+ * Fenetre principale Swing pour Power Grid Tycoon.
+ * Interface minimaliste inspiree de Universal Paperclips.
  */
 public class GameFrame extends JFrame {
     
@@ -52,16 +52,16 @@ public class GameFrame extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
         
-        // Start visual clock animation (updates display only, doesn't advance game)
+        // Demarrer l'animation de l'horloge (affichage seulement, ne fait pas avancer le jeu)
         statusPanel.startClockAnimation();
         
-        // Start stats animation (refresh UI every 500ms for smooth updates)
+        // Demarrer l'animation des stats (rafraichir l'UI toutes les 500ms)
         startStatsAnimation();
     }
     
     private void startStatsAnimation() {
         javax.swing.Timer statsTimer = new javax.swing.Timer(500, e -> {
-            // Only update stats display, don't advance game
+            // Mettre a jour l'affichage des stats seulement, ne pas avancer le jeu
             statusPanel.update();
             bottomStatsPanel.update();
         });
@@ -69,7 +69,7 @@ public class GameFrame extends JFrame {
     }
     
     public void refresh() {
-        // Check for game over
+        // Verifier le game over
         if (model.getState() == GameState.GAME_OVER) {
             statusPanel.stopClockAnimation();
             javax.swing.JOptionPane.showMessageDialog(this, 

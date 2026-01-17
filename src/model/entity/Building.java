@@ -105,3 +105,4 @@ public abstract class Building implements Serializable {
                 '}';
     }
 }
+

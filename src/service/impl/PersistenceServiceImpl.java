@@ -24,10 +24,10 @@ public class PersistenceServiceImpl implements PersistenceService {
         String path = SAVE_DIR + fileName + ".tycoon";
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path))) {
             oos.writeObject(model);
-            System.out.println("Game saved to: " + path);
+            System.out.println("Partie sauvegardee: " + path);
         } catch (IOException e) {
             e.printStackTrace();
-            System.err.println("Failed to save game: " + e.getMessage());
+            System.err.println("Echec de la sauvegarde: " + e.getMessage());
         }
     }
 
@@ -41,11 +41,11 @@ public class PersistenceServiceImpl implements PersistenceService {
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path))) {
             GameModel model = (GameModel) ois.readObject();
-            System.out.println("Game loaded from: " + path);
+            System.out.println("Partie chargee depuis: " + path);
             return model;
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
-            System.err.println("Failed to load game: " + e.getMessage());
+            System.err.println("Echec du chargement: " + e.getMessage());
             return null;
         }
     }

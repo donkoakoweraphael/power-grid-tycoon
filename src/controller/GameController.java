@@ -24,14 +24,14 @@ public class GameController {
 
     public void startConsole(String cityName) {
         this.model = gameService.createNewGame(cityName);
-        System.out.println("New Game Started: " + cityName);
+        System.out.println("Nouvelle partie demarree: " + cityName);
         printStatus();
     }
     
     public void printStatus() {
         if (model == null) return;
-        System.out.println("\n=== Day " + model.getCity().getCurrentDay() + " | TIME: " + model.getCity().getCurrentHour() + ":00 ===");
-        System.out.printf("Money: %.2f | Pop: %d | Happiness: %.2f%%%n", 
+        System.out.println("\n=== Jour " + model.getCity().getCurrentDay() + " | HEURE: " + model.getCity().getCurrentHour() + ":00 ===");
+        System.out.printf("Argent: %.2f | Pop: %d | Bonheur: %.2f%%%n", 
             model.getCity().getTotalCoins(), 
             model.getCity().getTotalPopulation(), 
             model.getCity().getGlobalHappiness());
@@ -48,16 +48,16 @@ public class GameController {
         double demand = model.getCity().getTotalEnergyDemand();
         double deficit = demand - actualProduction;
         
-        System.out.printf("Energy: %.2f MW production | %.2f MW demand", actualProduction, demand);
+        System.out.printf("Energie: %.2f MW production | %.2f MW demande", actualProduction, demand);
         if (deficit > 0) {
             System.out.printf(" | DEFICIT: %.2f MW%n", deficit);
         } else {
             System.out.printf(" | Surplus: %.2f MW%n", -deficit);
         }
         
-        // Event Board
+        // Tableau des evenements
         if (!model.getCity().getEventLog().isEmpty()) {
-            System.out.println("\n📰 RECENT EVENTS:");
+            System.out.println("\nEVENEMENTS RECENTS:");
             for (String event : model.getCity().getEventLog()) {
                 System.out.println("  " + event);
             }

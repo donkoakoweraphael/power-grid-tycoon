@@ -5,7 +5,7 @@ import java.awt.*;
 import model.GameModel;
 
 /**
- * Status panel displaying game stats.
+ * Panneau d'etat affichant les statistiques du jeu.
  */
 public class StatusPanel extends JPanel {
     
@@ -57,7 +57,7 @@ public class StatusPanel extends JPanel {
     }
     
     public void startClockAnimation() {
-        // Visual clock that shows minutes passing (purely cosmetic)
+        // Horloge visuelle qui montre les minutes qui passent (purement cosmetique)
         clockTimer = new javax.swing.Timer(100, e -> {
             displayMinutes = (displayMinutes + 1) % 60;
             updateClockDisplay();
@@ -72,7 +72,7 @@ public class StatusPanel extends JPanel {
     }
     
     private void updateClockDisplay() {
-        // Update only the time display with animated minutes
+        // Mettre a jour uniquement l'affichage du temps avec les minutes animees
         dayLabel.setText(String.format("[J%d %02d:%02d]", 
             model.getCity().getCurrentDay(), 
             model.getCity().getCurrentHour(),
@@ -86,7 +86,7 @@ public class StatusPanel extends JPanel {
     }
     
     public void update() {
-        // Sync display minutes when hour changes
+        // Synchroniser les minutes affichees quand l'heure change
         displayMinutes = 0;
         
         dayLabel.setText(String.format("[J%d %02d:%02d]", 
@@ -104,7 +104,7 @@ public class StatusPanel extends JPanel {
         String happyIcon = happiness > 70 ? ":)" : happiness > 40 ? ":|" : ":(";
         happinessLabel.setText(String.format("%s %.0f%%", happyIcon, happiness));
         
-        // Calculate actual production and demand
+        // Calculer la production et la demande actuelles
         double production = model.getCity().getTotalEnergyAvailable();
         double demand = model.getCity().getTotalEnergyDemand();
         

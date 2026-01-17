@@ -8,7 +8,7 @@ import model.entity.PowerPlant;
 import model.entity.Residence;
 
 /**
- * Grid panel displaying the city map.
+ * Panneau de grille affichant la carte de la ville.
  */
 public class GridPanel extends JPanel {
     
@@ -28,7 +28,7 @@ public class GridPanel extends JPanel {
         setPreferredSize(new Dimension(gridSize, gridSize));
         setBackground(Color.BLACK);
         
-        // Mouse click listener
+        // Ecouteur de clic souris
         addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
@@ -54,31 +54,31 @@ public class GridPanel extends JPanel {
         int gridWidth = model.getCity().getWidth();
         int gridHeight = model.getCity().getHeight();
         
-        int LABEL_OFFSET = 25; // Space for axis labels
+        int LABEL_OFFSET = 25; // Espace pour les etiquettes des axes
         
-        // Draw axis labels
+        // Dessiner les etiquettes des axes
         g2d.setFont(new Font("Arial", Font.BOLD, 14));
         g2d.setColor(Color.WHITE);
         
-        // X-axis labels (top)
+        // Etiquettes axe X (haut)
         for (int x = 0; x < gridWidth; x++) {
             int px = LABEL_OFFSET + x * CELL_SIZE + CELL_SIZE / 2;
             g2d.drawString(String.valueOf(x), px - 4, 18);
         }
         
-        // Y-axis labels (left)
+        // Etiquettes axe Y (gauche)
         for (int y = 0; y < gridHeight; y++) {
             int py = LABEL_OFFSET + y * CELL_SIZE + CELL_SIZE / 2;
             g2d.drawString(String.valueOf(y), 8, py + 5);
         }
         
-        // Draw grass tiles with checkerboard pattern for depth
+        // Dessiner les tuiles d'herbe avec motif en damier pour la profondeur
         for (int x = 0; x < gridWidth; x++) {
             for (int y = 0; y < gridHeight; y++) {
                 int px = LABEL_OFFSET + x * CELL_SIZE;
                 int py = LABEL_OFFSET + y * CELL_SIZE;
                 
-                // Alternating grass shades for depth
+                // Nuances d'herbe alternees pour la profondeur
                 boolean isDark = (x + y) % 2 == 0;
                 Color grassShade = isDark ? 
                     new Color(60, 179, 113) :  // Medium sea green
@@ -87,13 +87,13 @@ public class GridPanel extends JPanel {
                 g2d.setColor(grassShade);
                 g2d.fillRect(px, py, CELL_SIZE, CELL_SIZE);
                 
-                // Subtle grid lines
+                // Lignes de grille subtiles
                 g2d.setColor(new Color(40, 120, 70, 100));
                 g2d.drawRect(px, py, CELL_SIZE, CELL_SIZE);
             }
         }
         
-        // Draw buildings
+        // Dessiner les batiments
         Building[][] grid = model.getCity().getGrid();
         for (int x = 0; x < gridWidth; x++) {
             for (int y = 0; y < gridHeight; y++) {
@@ -109,7 +109,7 @@ public class GridPanel extends JPanel {
         int px = offset + x * CELL_SIZE;
         int py = offset + y * CELL_SIZE;
         
-        // Building colors and style
+        // Couleurs et style des batiments
         Color baseColor, accentColor;
         String label;
         

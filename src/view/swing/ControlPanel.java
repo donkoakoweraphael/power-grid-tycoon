@@ -5,7 +5,7 @@ import java.awt.*;
 import controller.GameController;
 
 /**
- * Control panel with build buttons.
+ * Panneau de controle avec les boutons d'action du jeu.
  */
 public class ControlPanel extends JPanel {
     
@@ -25,7 +25,7 @@ public class ControlPanel extends JPanel {
         
         Font buttonFont = new Font("Segoe UI", Font.BOLD, 13);
         
-        // Next hour button
+        // Bouton heure suivante
         JButton nextBtn = createStyledButton("> Heure Suivante", new Color(76, 175, 80));
         nextBtn.setFont(buttonFont);
         nextBtn.addActionListener(e -> {
@@ -34,7 +34,7 @@ public class ControlPanel extends JPanel {
         });
         add(nextBtn);
         
-        // Unified build button
+        // Bouton de construction unifie
         JButton buildBtn = createStyledButton("+ Construire", new Color(33, 150, 243));
         buildBtn.setFont(buttonFont);
         buildBtn.addActionListener(e -> showBuildDialog());
@@ -57,7 +57,7 @@ public class ControlPanel extends JPanel {
         content.add(title);
         content.add(Box.createVerticalStrut(20));
         
-        // Power plants section
+        // Section centrales electriques
         JLabel plantLabel = new JLabel("[CENTRALES ELECTRIQUES]");
         plantLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
         content.add(plantLabel);
@@ -84,7 +84,7 @@ public class ControlPanel extends JPanel {
         
         content.add(Box.createVerticalStrut(10));
         
-        // Residences section
+        // Section residences
         JLabel houseLabel = new JLabel("[RESIDENCES]");
         houseLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
         content.add(houseLabel);

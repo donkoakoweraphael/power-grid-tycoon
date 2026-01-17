@@ -5,7 +5,7 @@ import java.awt.*;
 import model.GameModel;
 
 /**
- * Bottom statistics panel showing key metrics.
+ * Panneau de statistiques affichant les mesures cles.
  */
 public class BottomStatsPanel extends JPanel {
     
@@ -27,10 +27,10 @@ public class BottomStatsPanel extends JPanel {
         
         Font labelFont = new Font("Segoe UI", Font.BOLD, 12);
         
-        productionLabel = createStatLabel("Production: 0.0 MW", new Color(46, 125, 50));  // Dark green
-        demandLabel = createStatLabel("Demande: 0.0 MW", new Color(25, 118, 210));       // Dark blue
-        deficitLabel = createStatLabel("Equilibre: 0.0 MW", new Color(97, 97, 97));      // Dark gray
-        pollutionLabel = createStatLabel("Pollution: 0 PP", new Color(230, 81, 0));      // Dark orange
+        productionLabel = createStatLabel("Production: 0.0 MW", new Color(46, 125, 50));  // Vert fonce
+        demandLabel = createStatLabel("Demande: 0.0 MW", new Color(25, 118, 210));       // Bleu fonce
+        deficitLabel = createStatLabel("Equilibre: 0.0 MW", new Color(97, 97, 97));      // Gris fonce
+        pollutionLabel = createStatLabel("Pollution: 0 PP", new Color(230, 81, 0));      // Orange fonce
         
         productionLabel.setFont(labelFont);
         demandLabel.setFont(labelFont);
@@ -69,7 +69,7 @@ public class BottomStatsPanel extends JPanel {
         productionLabel.setText(String.format("[+] Production: %.1f MW", production));
         demandLabel.setText(String.format("[-] Demande: %.1f MW", demand));
         
-        // Update balance color based on deficit/surplus
+        // Mettre a jour la couleur de l'equilibre selon le deficit/surplus
         if (balance >= 0) {
             deficitLabel.setText(String.format("[OK] Surplus: +%.1f MW", balance));
             deficitLabel.setForeground(new Color(76, 175, 80));
