@@ -64,7 +64,6 @@ public class StatusPanel extends JPanel {
         happinessLabel = new JLabel();
         energyLabel = new JLabel();
         priceLabel = new JLabel();
-        ppLabel = new JLabel();
 
         dayLabel.setFont(labelFont);
         moneyLabel.setFont(labelFont);
@@ -72,6 +71,7 @@ public class StatusPanel extends JPanel {
         happinessLabel.setFont(labelFont);
         energyLabel.setFont(labelFont);
         priceLabel.setFont(labelFont);
+        ppLabel = new JLabel();
         ppLabel.setFont(labelFont);
 
         add(dayLabel);
@@ -162,10 +162,11 @@ public class StatusPanel extends JPanel {
                 stored, capacity));
 
         // Price Label
-        priceLabel.setText(String.format("Prix élec : 🪙 %.2f/MWh", model.getCity().getElectricityPrice()));
+        priceLabel.setText(String.format("Prix élec : 🪙 %.2f/kWh", model.getCity().getElectricityPrice()));
 
         // Purchasing Power Label
-        ppLabel.setText(String.format("Pouvoir d'achat : 🪙 %.1f/MWh", model.getCity().getAvgPurchasingPower()));
+        double avgPP = model.getCity().getAvgPurchasingPower();
+        ppLabel.setText(String.format("Salaires : 🪙 %.0f", avgPP));
     }
 
     public void setModel(GameModel model) {

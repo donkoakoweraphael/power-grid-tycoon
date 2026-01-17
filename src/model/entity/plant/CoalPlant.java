@@ -22,13 +22,13 @@ public class CoalPlant extends PowerPlant {
     // Stats at level 1
     public static final double BASE_POWER_OUTPUT = 350.0; // Boosted x17.5 (was 20.0)
     public static final double BASE_STORAGE_CAPACITY = 450.0; // Boosted x15 (was 30.0)
-    public static final double BASE_DAILY_COST = 1200.0; // Increased
+    public static final double BASE_DAILY_COST = 500.0; // High cost
     public static final double BASE_POLLUTION_RATE = 100.0;
 
     // Growth rates per level
     public static final double POWER_OUTPUT_GROWTH_RATE = 1.45; // +45% per level
     public static final double STORAGE_GROWTH_RATE = 1.40; // +40% per level
-    public static final double DAILY_COST_GROWTH_RATE = 2.22; // +122% per level (> 2.0)
+    public static final double DAILY_COST_GROWTH_RATE = 1.22; // +22% per level
     public static final double POLLUTION_REDUCTION_RATE = 0.98; // -2% per level (technology improvement)
 
     // Upgrade
@@ -46,11 +46,6 @@ public class CoalPlant extends PowerPlant {
     public CoalPlant(String id) {
         super(id, BASE_POWER_OUTPUT, BASE_STORAGE_CAPACITY, BASE_DAILY_COST,
                 BASE_POLLUTION_RATE, BASE_CONSTRUCTION_COST, BASE_CONSTRUCTION_TIME, DEFAULT_MAX_LEVEL);
-    }
-
-    @Override
-    public String getGridCode() {
-        return "COAL";
     }
 
     @Override

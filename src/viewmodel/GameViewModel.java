@@ -5,6 +5,7 @@ import model.entity.City;
 import model.entity.PowerPlant;
 import model.entity.Residence;
 import model.entity.plant.*;
+import model.enums.PlantStatus;
 import model.enums.GameState;
 import observer.GameModelObserver;
 import observer.GameViewObserver;
@@ -83,10 +84,6 @@ public class GameViewModel implements GameModelObserver {
 
     public String getPriceText() {
         return String.format("%.2f pièces/MWh", model.getCity().getElectricityPrice());
-    }
-
-    public String getAvgPurchasingPowerText() {
-        return String.format("%.1f 🪙/MWh", model.getCity().getAvgPurchasingPower());
     }
 
     // ========== Energy Metrics ==========

@@ -94,11 +94,19 @@ public abstract class Building implements Serializable {
         return health <= 0;
     }
 
-    // ========== Standard Methods ==========
-
     public String getGridCode() {
-        return "?";
+        if (id == null || id.isEmpty())
+            return "??";
+        // Extract prefix before dash if present (e.g. "solar-1" -> "SO") or first 2
+        // chars
+        String prefix = id;
+        if (id.contains("-")) {
+            prefix = id.split("-")[0];
+        }
+        return prefix.length() > 2 ? prefix.substring(0, 2).toUpperCase() : prefix.toUpperCase();
     }
+
+    // ========== Standard Methods ==========
 
     @Override
     public String toString() {

@@ -22,13 +22,13 @@ public class SolarPlant extends PowerPlant {
     // Stats at level 1
     public static final double BASE_POWER_OUTPUT = 120.0; // Boosted x15 (was 8.0)
     public static final double BASE_STORAGE_CAPACITY = 480.0; // Boosted x15 (was 32.0)
-    public static final double BASE_DAILY_COST = 500.0; // Increased
+    public static final double BASE_DAILY_COST = 200.0; // Keep cost same (cheaper relative to output)
     public static final double BASE_POLLUTION_RATE = 0.0; // Eco-friendly
 
     // Growth rates per level
     public static final double POWER_OUTPUT_GROWTH_RATE = 1.50; // +50% per level
     public static final double STORAGE_GROWTH_RATE = 1.45; // +45% per level
-    public static final double DAILY_COST_GROWTH_RATE = 2.05; // +105% per level (> 2.0)
+    public static final double DAILY_COST_GROWTH_RATE = 1.15; // +15% per level
     public static final double POLLUTION_REDUCTION_RATE = 1.0; // No pollution, no change
 
     // Upgrade
@@ -46,11 +46,6 @@ public class SolarPlant extends PowerPlant {
     public SolarPlant(String id) {
         super(id, BASE_POWER_OUTPUT, BASE_STORAGE_CAPACITY, BASE_DAILY_COST,
                 BASE_POLLUTION_RATE, BASE_CONSTRUCTION_COST, BASE_CONSTRUCTION_TIME, DEFAULT_MAX_LEVEL);
-    }
-
-    @Override
-    public String getGridCode() {
-        return "SUN";
     }
 
     @Override

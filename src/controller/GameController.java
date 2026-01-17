@@ -83,10 +83,6 @@ public class GameController {
         printStatus();
     }
 
-    public void handleMoveBuilding(int oldX, int oldY, int newX, int newY) {
-        gameService.moveBuilding(model, oldX, oldY, newX, newY);
-    }
-
     public void handleBuyPlant(String type, String id, int x, int y) throws Exception {
         gameService.buyPowerPlant(model, type, id, x, y);
         System.out.println("Construction: " + type + " en (" + x + "," + y + ")");
@@ -98,6 +94,10 @@ public class GameController {
         gameService.buildResidence(model, id, x, y);
         System.out.println("Construction: Maison en (" + x + "," + y + ")");
         printMap();
+    }
+
+    public void handleMoveBuilding(int oldX, int oldY, int newX, int newY) {
+        gameService.moveBuilding(model, oldX, oldY, newX, newY);
     }
 
     public void handleUpgradeBuilding(String id) {
