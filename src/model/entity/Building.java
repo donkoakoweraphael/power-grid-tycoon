@@ -14,6 +14,9 @@ public abstract class Building implements Serializable {
 
     protected int x;
     protected int y;
+    
+    protected double maxHealth = 100.0;
+    protected double health = 100.0;
 
     /**
      * Constructor for Building.

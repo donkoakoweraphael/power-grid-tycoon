@@ -49,6 +49,9 @@ public class City implements Serializable {
 
     private List<PowerPlant> powerPlants;
     private List<Residence> residences;
+    
+    private java.util.List<String> eventLog;
+    private static final int MAX_EVENT_LOG_SIZE = 5;
 
     /**
      * Default constructor for City.
@@ -79,6 +82,7 @@ public class City implements Serializable {
 
         this.powerPlants = new ArrayList<>();
         this.residences = new ArrayList<>();
+        this.eventLog = new java.util.ArrayList<>();
     }
 
     // ========== Getters ==========
@@ -236,4 +240,17 @@ public class City implements Serializable {
     public int getWidth() { return width; }
     public int getHeight() { return height; }
     public Building[][] getGrid() { return grid; }
+    
+    public void addEvent(String message) {
+        String timestamp = String.format("Day %d, %02d:00", currentDay, currentHour);
+        eventLog.add(0, timestamp + " - " + message);
+        
+        if (eventLog.size() > MAX_EVENT_LOG_SIZE) {
+            eventLog.remove(eventLog.size() - 1);
+        }
+    }
+    
+    public java.util.List<String> getEventLog() {
+        return new java.util.ArrayList<>(eventLog);
+    }
 }

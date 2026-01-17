@@ -117,8 +117,6 @@ public class GameController {
             System.out.printf("Health: %.1f / %.1f%n", b.getHealth(), b.getMaxHealth());
             
             if (b instanceof model.entity.Residence) {
-            
-            if (b instanceof model.entity.Residence) {
                 model.entity.Residence r = (model.entity.Residence) b;
                 System.out.println("Type: RESIDENCE (Lvl " + r.getLevel() + ")");
                 System.out.println("Occupancy: " + r.getCurrentOccupancy() + " / " + r.getMaxCapacity() + " people");
@@ -126,16 +124,16 @@ public class GameController {
                 System.out.println("Supplied: " + (r.isSupplied() ? "YES" : "NO"));
                 System.out.printf("Purchasing Power: %.2f coins/MWh%n", r.getPurchasingPower());
             } else if (b instanceof model.entity.PowerPlant) {
-            model.entity.PowerPlant p = (model.entity.PowerPlant) b;
-            System.out.println("Type: " + p.getClass().getSimpleName() + " (Lvl " + p.getLevel() + ")");
-            System.out.println("Status: " + p.getStatus());
-            System.out.printf("Output: %.2f MW%n", p.getPowerOutput());
-            if (p.getStorageCapacity() > 0) {
-                 System.out.printf("Storage: %.2f / %.2f MWh%n", p.getCurrentEnergyStored(), p.getStorageCapacity());
+                model.entity.PowerPlant p = (model.entity.PowerPlant) b;
+                System.out.println("Type: " + p.getClass().getSimpleName() + " (Lvl " + p.getLevel() + ")");
+                System.out.println("Status: " + p.getStatus());
+                System.out.printf("Output: %.2f MW%n", p.getPowerOutput());
+                if (p.getStorageCapacity() > 0) {
+                     System.out.printf("Storage: %.2f / %.2f MWh%n", p.getCurrentEnergyStored(), p.getStorageCapacity());
+                }
+                System.out.printf("Op. Cost: %.2f coins/day%n", p.getDailyCost());
+                System.out.printf("Pollution: %.2f PP/day%n", p.getPollutionRate());
             }
-            System.out.printf("Op. Cost: %.2f coins/day%n", p.getDailyCost());
-            System.out.printf("Pollution: %.2f PP/day%n", p.getPollutionRate());
-        }
         }
         System.out.println("====================\n");
     }

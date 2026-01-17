@@ -2,6 +2,7 @@ package service.impl;
 
 import model.entity.City;
 import model.entity.PowerPlant;
+import model.entity.Building;
 import service.CityService;
 import service.PowerPlantService;
 import service.ResidenceService;
@@ -276,7 +277,7 @@ public class CityServiceImpl implements CityService {
             Building b = city.getGrid()[x][y];
             if (b != null) {
                 b.takeDamage(30);
-                city.addEvent("🔥 FIRE at (" + x + "," + y + ")! Building damaged (-30 health)");
+                city.addEvent("[FIRE] at (" + x + "," + y + ")! Building damaged (-30 health)");
                 
                 if (b.isDestroyed()) {
                     handleBuildingDestruction(city, b, x, y, "fire");
@@ -308,7 +309,7 @@ public class CityServiceImpl implements CityService {
             }
             
             if (damaged > 0) {
-                city.addEvent("🌪️ STORM near (" + centerX + "," + centerY + ")! " + damaged + " buildings damaged");
+                city.addEvent("[STORM] near (" + centerX + "," + centerY + ")! " + damaged + " buildings damaged");
             }
         }
     }
@@ -345,7 +346,7 @@ public class CityServiceImpl implements CityService {
             }
             
             if (damaged > 0) {
-                city.addEvent("🌍 EARTHQUAKE at (" + centerX + "," + centerY + ")! " + damaged + " damaged, " + destroyed + " destroyed");
+                city.addEvent("[EARTHQUAKE] at (" + centerX + "," + centerY + ")! " + damaged + " damaged, " + destroyed + " destroyed");
             }
         } else {
             // TORNADO - affects a line of buildings
@@ -375,7 +376,7 @@ public class CityServiceImpl implements CityService {
             }
             
             if (damaged > 0) {
-                city.addEvent("🌪️ TORNADO from (" + startX + "," + startY + ")! " + damaged + " damaged, " + destroyed + " destroyed");
+                city.addEvent("[TORNADO] from (" + startX + "," + startY + ")! " + damaged + " damaged, " + destroyed + " destroyed");
             }
         }
     }
