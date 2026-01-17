@@ -9,6 +9,7 @@ import model.entity.PowerPlant;
  * Strategic for balancing renewable energy production and peak demand.
  */
 public class BatteryStorage extends PowerPlant {
+    private static final long serialVersionUID = 1L;
 
     // ========== Class Variables (Static) ==========
 
@@ -56,5 +57,41 @@ public class BatteryStorage extends PowerPlant {
     @Override
     public String getShopDescription() {
         return DESCRIPTION;
+    }
+
+    // ========== Upgrade Constants Implementation ==========
+    @Override
+    public double getPowerOutputGrowthRate() {
+        return POWER_OUTPUT_GROWTH_RATE;
+    }
+
+    @Override
+    public double getStorageGrowthRate() {
+        return STORAGE_GROWTH_RATE;
+    }
+
+    @Override
+    public double getDailyCostGrowthRate() {
+        return DAILY_COST_GROWTH_RATE;
+    }
+
+    @Override
+    public double getPollutionReductionRate() {
+        return POLLUTION_REDUCTION_RATE;
+    }
+
+    @Override
+    public double getUpgradeCostMultiplier() {
+        return UPGRADE_COST_MULTIPLIER;
+    }
+
+    @Override
+    public int getUpgradeTimeBase() {
+        return UPGRADE_TIME_BASE;
+    }
+
+    @Override
+    public double getUpgradeCostBase() {
+        return UPGRADE_COST_BASE;
     }
 }

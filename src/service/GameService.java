@@ -19,6 +19,11 @@ public interface GameService {
     void buildResidence(model.GameModel model, String id, int x, int y);
 
     /**
+     * Allows a player to move an existing building to new coordinates.
+     */
+    void moveBuilding(model.GameModel model, int oldX, int oldY, int newX, int newY);
+
+    /**
      * Starts an upgrade for a specific building (PowerPlant or Residence).
      */
     void upgradeBuilding(model.GameModel model, String buildingId);

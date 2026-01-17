@@ -8,6 +8,7 @@ import model.entity.PowerPlant;
  * Higher storage ratio to compensate for variability.
  */
 public class WindPlant extends PowerPlant {
+    private static final long serialVersionUID = 1L;
 
     // ========== Class Variables (Static) ==========
 
@@ -19,9 +20,9 @@ public class WindPlant extends PowerPlant {
     public static final int DEFAULT_MAX_LEVEL = 4;
 
     // Stats at level 1
-    public static final double BASE_POWER_OUTPUT = 6.0; // Reduced for game balance
-    public static final double BASE_STORAGE_CAPACITY = 18.0; // 3x ratio for wind variability
-    public static final double BASE_DAILY_COST = 250.0; // More expensive than solar (variable output)
+    public static final double BASE_POWER_OUTPUT = 90.0; // Boosted x15 (was 6.0)
+    public static final double BASE_STORAGE_CAPACITY = 270.0; // Boosted x15 (was 18.0)
+    public static final double BASE_DAILY_COST = 250.0; // More expensive than solar
     public static final double BASE_POLLUTION_RATE = 0.0; // Eco-friendly
 
     // Growth rates per level
@@ -55,5 +56,41 @@ public class WindPlant extends PowerPlant {
     @Override
     public String getShopDescription() {
         return DESCRIPTION;
+    }
+
+    // ========== Upgrade Constants Implementation ==========
+    @Override
+    public double getPowerOutputGrowthRate() {
+        return POWER_OUTPUT_GROWTH_RATE;
+    }
+
+    @Override
+    public double getStorageGrowthRate() {
+        return STORAGE_GROWTH_RATE;
+    }
+
+    @Override
+    public double getDailyCostGrowthRate() {
+        return DAILY_COST_GROWTH_RATE;
+    }
+
+    @Override
+    public double getPollutionReductionRate() {
+        return POLLUTION_REDUCTION_RATE;
+    }
+
+    @Override
+    public double getUpgradeCostMultiplier() {
+        return UPGRADE_COST_MULTIPLIER;
+    }
+
+    @Override
+    public int getUpgradeTimeBase() {
+        return UPGRADE_TIME_BASE;
+    }
+
+    @Override
+    public double getUpgradeCostBase() {
+        return UPGRADE_COST_BASE;
     }
 }

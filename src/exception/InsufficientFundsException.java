@@ -5,6 +5,6 @@ package exception;
  */
 public class InsufficientFundsException extends GameException {
     public InsufficientFundsException(double required, double current) {
-        super(String.format("Insufficient funds: required %.2f, but only have %.2f", required, current));
+        super(String.format("Fonds insuffisants: %.2f requis, mais seulement %.2f disponibles", required, current));
     }
 }

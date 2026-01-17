@@ -10,6 +10,7 @@ import java.util.List;
  * Acts as a data container for city state.
  */
 public class City implements Serializable {
+    private static final long serialVersionUID = -6757152567066355887L;
 
     // Simulation Constants
     public static final double POLLUTION_DISSIPATION_RATE = 0.05; // 5% per day
@@ -23,8 +24,8 @@ public class City implements Serializable {
     public static final int INITIAL_POPULATION = 100;
     public static final double DEFAULT_ELECTRICITY_PRICE = 12.0;
 
-    public static final int INITIAL_GRID_WIDTH = 10;
-    public static final int INITIAL_GRID_HEIGHT = 10;
+    public static final int GRID_WIDTH = 16;
+    public static final int GRID_HEIGHT = 10;
 
     private String name;
     private int currentDay;
@@ -42,6 +43,7 @@ public class City implements Serializable {
     private double totalPollution;
 
     // Global Electricity Metrics
+    private double totalEnergyProduced; // Pure hourly production
     private double totalEnergyAvailable;
     private double totalStorageCapacity;
     private double totalEnergyDemand;
@@ -49,9 +51,11 @@ public class City implements Serializable {
 
     private List<PowerPlant> powerPlants;
     private List<Residence> residences;
-    
+
     private java.util.List<String> eventLog;
     private static final int MAX_EVENT_LOG_SIZE = 5;
+
+    private List<Double> profitHistory;
 
     /**
      * Default constructor for City.
@@ -71,9 +75,9 @@ public class City implements Serializable {
         this.totalCoins = initialCoins;
         this.currentDay = 1;
         this.electricityPrice = DEFAULT_ELECTRICITY_PRICE;
-        
-        this.width = INITIAL_GRID_WIDTH;
-        this.height = INITIAL_GRID_HEIGHT;
+
+        this.width = GRID_WIDTH;
+        this.height = GRID_HEIGHT;
         this.grid = new Building[width][height];
 
         this.globalHappiness = 100.0;
@@ -83,9 +87,14 @@ public class City implements Serializable {
         this.powerPlants = new ArrayList<>();
         this.residences = new ArrayList<>();
         this.eventLog = new java.util.ArrayList<>();
+        this.profitHistory = new ArrayList<>();
     }
 
     // ========== Getters ==========
+
+    public List<Double> getProfitHistory() {
+        return new ArrayList<>(profitHistory);
+    }
 
     public String getName() {
         return name;
@@ -94,7 +103,7 @@ public class City implements Serializable {
     public int getCurrentDay() {
         return currentDay;
     }
-    
+
     public int getCurrentHour() {
         return currentHour;
     }
@@ -117,6 +126,10 @@ public class City implements Serializable {
 
     public double getTotalPollution() {
         return totalPollution;
+    }
+
+    public double getTotalEnergyProduced() {
+        return totalEnergyProduced;
     }
 
     public double getTotalEnergyAvailable() {
@@ -152,7 +165,7 @@ public class City implements Serializable {
     public void setCurrentDay(int currentDay) {
         this.currentDay = currentDay;
     }
-    
+
     public void setCurrentHour(int currentHour) {
         this.currentHour = currentHour;
     }
@@ -175,6 +188,10 @@ public class City implements Serializable {
 
     public void setTotalPollution(double totalPollution) {
         this.totalPollution = totalPollution;
+    }
+
+    public void setTotalEnergyProduced(double totalEnergyProduced) {
+        this.totalEnergyProduced = totalEnergyProduced;
     }
 
     public void setTotalEnergyAvailable(double totalEnergyAvailable) {
@@ -225,32 +242,79 @@ public class City implements Serializable {
         this.residences.add(residence);
         placeOnGrid(residence);
     }
-    
+
     private void placeOnGrid(Building b) {
         if (b.getX() >= 0 && b.getX() < width && b.getY() >= 0 && b.getY() < height) {
             grid[b.getX()][b.getY()] = b;
         }
     }
-    
+
     public boolean isCellOccupied(int x, int y) {
-        if (x < 0 || x >= width || y < 0 || y >= height) return true; // Out of bounds is "occupied"
+        if (x < 0 || x >= width || y < 0 || y >= height)
+            return true; // Out of bounds is "occupied"
         return grid[x][y] != null;
     }
-    
-    public int getWidth() { return width; }
-    public int getHeight() { return height; }
-    public Building[][] getGrid() { return grid; }
-    
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public Building[][] getGrid() {
+        return grid;
+    }
+
     public void addEvent(String message) {
         String timestamp = String.format("Day %d, %02d:00", currentDay, currentHour);
         eventLog.add(0, timestamp + " - " + message);
-        
+
         if (eventLog.size() > MAX_EVENT_LOG_SIZE) {
             eventLog.remove(eventLog.size() - 1);
         }
     }
-    
+
     public java.util.List<String> getEventLog() {
         return new java.util.ArrayList<>(eventLog);
+    }
+
+    public void addProfit(double profit) {
+        profitHistory.add(profit);
+        // Keep only last 30 days
+        if (profitHistory.size() > 30) {
+            profitHistory.remove(0);
+        }
+    }
+
+    public double getTotalPowerCapacity() {
+        return powerPlants.stream()
+                .mapToDouble(PowerPlant::getPowerOutput)
+                .sum();
+    }
+
+    public int getTotalHousingCapacity() {
+        return residences.stream()
+                .mapToInt(Residence::getMaxCapacity)
+                .sum();
+    }
+
+    // ========== Serialization Safety ==========
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        // Fix for legacy saves or uninitialized price
+        if (this.electricityPrice <= 0.001) {
+            this.electricityPrice = DEFAULT_ELECTRICITY_PRICE;
+        }
+        // Ensure lists are not null (extra safety)
+        if (this.profitHistory == null)
+            this.profitHistory = new ArrayList<>();
+        if (this.eventLog == null)
+            this.eventLog = new ArrayList<>();
+        if (this.powerPlants == null)
+            this.powerPlants = new ArrayList<>();
+        if (this.residences == null)
+            this.residences = new ArrayList<>();
     }
 }

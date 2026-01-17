@@ -8,6 +8,7 @@ import model.entity.PowerPlant;
  * High construction cost but very low operating costs.
  */
 public class HydroPlant extends PowerPlant {
+    private static final long serialVersionUID = 1L;
 
     // ========== Class Variables (Static) ==========
 
@@ -19,9 +20,9 @@ public class HydroPlant extends PowerPlant {
     public static final int DEFAULT_MAX_LEVEL = 4;
 
     // Stats at level 1
-    public static final double BASE_POWER_OUTPUT = 12.0; // Reduced for game balance
-    public static final double BASE_STORAGE_CAPACITY = 180.0; // 15x ratio - natural reservoir!
-    public static final double BASE_DAILY_COST = 300.0; // Moderate cost (expensive infrastructure)
+    public static final double BASE_POWER_OUTPUT = 200.0; // Boosted x16.6 (was 12.0)
+    public static final double BASE_STORAGE_CAPACITY = 2700.0; // Boosted x15 (was 180.0) - Massive reservoir
+    public static final double BASE_DAILY_COST = 300.0; // Moderate cost
     public static final double BASE_POLLUTION_RATE = 0.0; // Eco-friendly
 
     // Growth rates per level
@@ -55,5 +56,41 @@ public class HydroPlant extends PowerPlant {
     @Override
     public String getShopDescription() {
         return DESCRIPTION;
+    }
+
+    // ========== Upgrade Constants Implementation ==========
+    @Override
+    public double getPowerOutputGrowthRate() {
+        return POWER_OUTPUT_GROWTH_RATE;
+    }
+
+    @Override
+    public double getStorageGrowthRate() {
+        return STORAGE_GROWTH_RATE;
+    }
+
+    @Override
+    public double getDailyCostGrowthRate() {
+        return DAILY_COST_GROWTH_RATE;
+    }
+
+    @Override
+    public double getPollutionReductionRate() {
+        return POLLUTION_REDUCTION_RATE;
+    }
+
+    @Override
+    public double getUpgradeCostMultiplier() {
+        return UPGRADE_COST_MULTIPLIER;
+    }
+
+    @Override
+    public int getUpgradeTimeBase() {
+        return UPGRADE_TIME_BASE;
+    }
+
+    @Override
+    public double getUpgradeCostBase() {
+        return UPGRADE_COST_BASE;
     }
 }

@@ -7,6 +7,7 @@ import java.io.Serializable;
  * Defines common attributes like id, level, and maxLevel.
  */
 public abstract class Building implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     protected String id;
     protected int level;
@@ -14,7 +15,7 @@ public abstract class Building implements Serializable {
 
     protected int x;
     protected int y;
-    
+
     protected double maxHealth = 100.0;
     protected double health = 100.0;
 
@@ -45,7 +46,7 @@ public abstract class Building implements Serializable {
     public int getMaxLevel() {
         return maxLevel;
     }
-    
+
     public int getX() {
         return x;
     }
@@ -67,30 +68,42 @@ public abstract class Building implements Serializable {
     public void setMaxLevel(int maxLevel) {
         this.maxLevel = maxLevel;
     }
-    
+
     public void setPosition(int x, int y) {
         this.x = x;
         this.y = y;
     }
-    
+
     public double getHealth() {
         return health;
     }
-    
+
     public void setHealth(double health) {
         this.health = Math.max(0, Math.min(maxHealth, health));
     }
-    
+
     public double getMaxHealth() {
         return maxHealth;
     }
-    
+
     public void takeDamage(double damage) {
         this.health = Math.max(0, this.health - damage);
     }
-    
+
     public boolean isDestroyed() {
         return health <= 0;
+    }
+
+    public String getGridCode() {
+        if (id == null || id.isEmpty())
+            return "??";
+        // Extract prefix before dash if present (e.g. "solar-1" -> "SO") or first 2
+        // chars
+        String prefix = id;
+        if (id.contains("-")) {
+            prefix = id.split("-")[0];
+        }
+        return prefix.length() > 2 ? prefix.substring(0, 2).toUpperCase() : prefix.toUpperCase();
     }
 
     // ========== Standard Methods ==========
@@ -105,4 +118,3 @@ public abstract class Building implements Serializable {
                 '}';
     }
 }
-
