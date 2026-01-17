@@ -8,6 +8,7 @@ import model.entity.PowerPlant;
  * Very expensive construction and long build time.
  */
 public class NuclearPlant extends PowerPlant {
+    private static final long serialVersionUID = 1L;
 
     // ========== Class Variables (Static) ==========
 
@@ -19,9 +20,9 @@ public class NuclearPlant extends PowerPlant {
     public static final int DEFAULT_MAX_LEVEL = 3; // Fewer levels due to complexity
 
     // Stats at level 1
-    public static final double BASE_POWER_OUTPUT = 60.0; // Reduced for game balance
-    public static final double BASE_STORAGE_CAPACITY = 120.0; // 2x ratio for safety reserves
-    public static final double BASE_DAILY_COST = 1500.0; // Very expensive (safety + waste management)
+    public static final double BASE_POWER_OUTPUT = 1500.0; // Boosted x25 (was 60.0) - Massive power
+    public static final double BASE_STORAGE_CAPACITY = 1800.0; // Boosted x15 (was 120.0)
+    public static final double BASE_DAILY_COST = 1500.0; // Very expensive
     public static final double BASE_POLLUTION_RATE = 5.0; // Low (radioactive waste)
 
     // Growth rates per level
@@ -55,5 +56,41 @@ public class NuclearPlant extends PowerPlant {
     @Override
     public String getShopDescription() {
         return DESCRIPTION;
+    }
+
+    // ========== Upgrade Constants Implementation ==========
+    @Override
+    public double getPowerOutputGrowthRate() {
+        return POWER_OUTPUT_GROWTH_RATE;
+    }
+
+    @Override
+    public double getStorageGrowthRate() {
+        return STORAGE_GROWTH_RATE;
+    }
+
+    @Override
+    public double getDailyCostGrowthRate() {
+        return DAILY_COST_GROWTH_RATE;
+    }
+
+    @Override
+    public double getPollutionReductionRate() {
+        return POLLUTION_REDUCTION_RATE;
+    }
+
+    @Override
+    public double getUpgradeCostMultiplier() {
+        return UPGRADE_COST_MULTIPLIER;
+    }
+
+    @Override
+    public int getUpgradeTimeBase() {
+        return UPGRADE_TIME_BASE;
+    }
+
+    @Override
+    public double getUpgradeCostBase() {
+        return UPGRADE_COST_BASE;
     }
 }

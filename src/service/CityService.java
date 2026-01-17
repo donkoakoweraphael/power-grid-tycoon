@@ -9,7 +9,13 @@ public interface CityService {
     /**
      * Orchestrates the daily simulation for the city.
      */
-    void simulateDay(City city);
+    /**
+     * Simulates one hour of city life.
+     * Updates time, processes events, energy, finances, and happiness.
+     *
+     * @param city The city to simulate
+     */
+    void simulateHour(City city);
 
     /**
      * Updates global metrics (population, pollution, etc.).

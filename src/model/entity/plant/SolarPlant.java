@@ -8,6 +8,7 @@ import model.entity.PowerPlant;
  * High storage ratio to buffer for night/day cycles.
  */
 public class SolarPlant extends PowerPlant {
+    private static final long serialVersionUID = 1L;
 
     // ========== Class Variables (Static) ==========
 
@@ -19,9 +20,9 @@ public class SolarPlant extends PowerPlant {
     public static final int DEFAULT_MAX_LEVEL = 4;
 
     // Stats at level 1
-    public static final double BASE_POWER_OUTPUT = 8.0; // Reduced for game balance
-    public static final double BASE_STORAGE_CAPACITY = 32.0; // 4x ratio for day/night buffering
-    public static final double BASE_DAILY_COST = 200.0; // Cheapest option (baseline)
+    public static final double BASE_POWER_OUTPUT = 120.0; // Boosted x15 (was 8.0)
+    public static final double BASE_STORAGE_CAPACITY = 480.0; // Boosted x15 (was 32.0)
+    public static final double BASE_DAILY_COST = 200.0; // Keep cost same (cheaper relative to output)
     public static final double BASE_POLLUTION_RATE = 0.0; // Eco-friendly
 
     // Growth rates per level
@@ -55,5 +56,41 @@ public class SolarPlant extends PowerPlant {
     @Override
     public String getShopDescription() {
         return DESCRIPTION;
+    }
+
+    // ========== Upgrade Constants Implementation ==========
+    @Override
+    public double getPowerOutputGrowthRate() {
+        return POWER_OUTPUT_GROWTH_RATE;
+    }
+
+    @Override
+    public double getStorageGrowthRate() {
+        return STORAGE_GROWTH_RATE;
+    }
+
+    @Override
+    public double getDailyCostGrowthRate() {
+        return DAILY_COST_GROWTH_RATE;
+    }
+
+    @Override
+    public double getPollutionReductionRate() {
+        return POLLUTION_REDUCTION_RATE;
+    }
+
+    @Override
+    public double getUpgradeCostMultiplier() {
+        return UPGRADE_COST_MULTIPLIER;
+    }
+
+    @Override
+    public int getUpgradeTimeBase() {
+        return UPGRADE_TIME_BASE;
+    }
+
+    @Override
+    public double getUpgradeCostBase() {
+        return UPGRADE_COST_BASE;
     }
 }

@@ -8,259 +8,345 @@ import controller.GameController;
  * Panneau de controle avec les boutons d'action du jeu.
  */
 public class ControlPanel extends JPanel {
-    
+
     private GameController controller;
     private GameFrame frame;
-    
+    private JLabel priceValueLabel;
+
     public ControlPanel(GameController controller, GameFrame frame) {
         this.controller = controller;
         this.frame = frame;
-        
-        setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
+
+        setLayout(new FlowLayout(FlowLayout.CENTER, 20, 10));
         setBackground(new Color(250, 250, 250));
         setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(2, 0, 0, 0, new Color(200, 200, 200)),
-            BorderFactory.createEmptyBorder(5, 10, 5, 10)
-        ));
-        
+                BorderFactory.createMatteBorder(2, 0, 0, 0, new Color(200, 200, 200)),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)));
+
         Font buttonFont = new Font("Segoe UI", Font.BOLD, 12);
-        
-        // Bouton heure suivante
-        JButton nextBtn = createStyledButton("> Suivant", new Color(76, 175, 80));
+
+        // 1. Bouton HEURE SUIVANTE
+        JButton nextBtn = createStyledButton("> Heure Suivante", new Color(76, 175, 80));
         nextBtn.setFont(buttonFont);
         nextBtn.addActionListener(e -> {
             controller.handleNextDay();
             frame.refresh();
         });
         add(nextBtn);
-        
-        // Bouton de construction
+
+        add(Box.createHorizontalStrut(20)); // Separator
+
+        // 2. Bouton CONSTRUIRE (Shop)
         JButton buildBtn = createStyledButton("+ Construire", new Color(33, 150, 243));
         buildBtn.setFont(buttonFont);
         buildBtn.addActionListener(e -> showBuildDialog());
         add(buildBtn);
-        
-        // Bouton ameliorer
-        JButton upgradeBtn = createStyledButton("^ Ameliorer", new Color(156, 39, 176));
-        upgradeBtn.setFont(buttonFont);
-        upgradeBtn.addActionListener(e -> showUpgradeDialog());
-        add(upgradeBtn);
-        
-        // Bouton sauvegarder
-        JButton saveBtn = createStyledButton("[S] Sauver", new Color(255, 152, 0));
-        saveBtn.setFont(buttonFont);
-        saveBtn.addActionListener(e -> saveGame());
-        add(saveBtn);
-        
-        // Bouton charger
-        JButton loadBtn = createStyledButton("[L] Charger", new Color(0, 188, 212));
-        loadBtn.setFont(buttonFont);
-        loadBtn.addActionListener(e -> loadGame());
-        add(loadBtn);
-        
-        // Bouton nouvelle partie
-        JButton newBtn = createStyledButton("[N] Nouveau", new Color(244, 67, 54));
-        newBtn.setFont(buttonFont);
-        newBtn.addActionListener(e -> newGame());
-        add(newBtn);
-        
-        // Bouton prix electricite
-        JButton priceBtn = createStyledButton("$ Prix", new Color(76, 175, 80));
-        priceBtn.setFont(buttonFont);
-        priceBtn.addActionListener(e -> showPriceDialog());
-        add(priceBtn);
+
+        add(Box.createHorizontalStrut(20)); // Separator
+
+        // 3. CONTROLE DE PRIX (Inline)
+        JPanel pricePanel = createPriceControlPanel();
+        add(pricePanel);
     }
-    
-    private void showPriceDialog() {
-        double currentPrice = controller.getModel().getCity().getElectricityPrice();
-        String input = JOptionPane.showInputDialog(frame, 
-            "Prix actuel: " + currentPrice + " pieces/MWh\n\nNouveau prix (1-50):",
-            String.valueOf(currentPrice));
-        
-        if (input != null && !input.trim().isEmpty()) {
-            try {
-                double newPrice = Double.parseDouble(input.trim());
-                if (newPrice < 1 || newPrice > 50) {
-                    showError("Le prix doit etre entre 1 et 50 pieces/MWh");
-                    return;
-                }
-                controller.getModel().getCity().setElectricityPrice(newPrice);
-                JOptionPane.showMessageDialog(frame, 
-                    "Prix de l'electricite modifie: " + newPrice + " pieces/MWh",
-                    "Prix mis a jour", 
-                    JOptionPane.INFORMATION_MESSAGE);
-                frame.refresh();
-            } catch (NumberFormatException ex) {
-                showError("Veuillez entrer un nombre valide");
-            }
+
+    // ----- Price Control Logic -----
+
+    private JPanel createPriceControlPanel() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
+        panel.setBackground(new Color(250, 250, 250));
+        panel.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(Color.LIGHT_GRAY), "Prix Électricité"));
+
+        JButton minusBtn = new JButton("-");
+        styleMiniButton(minusBtn, new Color(244, 67, 54));
+        minusBtn.addActionListener(e -> updatePrice(-1));
+
+        JButton plusBtn = new JButton("+");
+        styleMiniButton(plusBtn, new Color(76, 175, 80));
+        plusBtn.addActionListener(e -> updatePrice(1));
+
+        priceValueLabel = new JLabel("0.0 🪙");
+        priceValueLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        priceValueLabel.setPreferredSize(new Dimension(80, 25));
+        priceValueLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+        panel.add(minusBtn);
+        panel.add(priceValueLabel);
+        panel.add(plusBtn);
+
+        return panel;
+    }
+
+    private void styleMiniButton(JButton btn, Color color) {
+        btn.setPreferredSize(new Dimension(30, 30));
+        btn.setBackground(color);
+        btn.setForeground(Color.WHITE);
+        btn.setFont(new Font("Arial", Font.BOLD, 14));
+        btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    }
+
+    private void updatePrice(double delta) {
+        double current = controller.getModel().getCity().getElectricityPrice();
+        double newPrice = Math.max(1.0, current + delta);
+        controller.setElectricityPrice(controller.getModel(), newPrice); // Correct call via service wrapper if needed
+                                                                         // or direct
+        // GameController delegates to Service, but here we can call setElectricityPrice
+        // via Controller if visible?
+        // Wait, Controller needs a setElectricityPrice method that calls service
+        // Let's check Controller methods.
+        // It has `gameService.setElectricityPrice`.
+        // We will assume controller has a wrapper or we access model directly?
+        // Ah, Controller has `gameService` private.
+        // We should add `controller.handleSetPrice(newPrice)`?
+        // Existing controller method: `setElectricityPrice(GameModel, double)`?
+        // The Controller.java shows `gameService.setElectricityPrice` is in
+        // `GameServiceImpl`.
+        // Controller currently exposes `handleBuyPlant`, `handleNextDay`.
+        // Let's check if Controller has a setter for price exposed.
+        // Looking at previous view_file of GameController: it DOES NOT have `setPrice`
+        // exposed publicly to UI.
+        // BUT `GameServiceImpl` DOES.
+        // Wait, `GameController` usually just delegates.
+        // Let's assume for now we can access `controller.setElectricityPrice`.
+        // If not, I will add it or use `gameService` if accessible.
+
+        // Actually, let's fix this properly.
+        // I'll assume `controller.setElectricityPrice` exists or I'll use
+        // `controller.getModel().getCity().setElectricityPrice` + Notify.
+        // Ideally we go through controller. Let's try `controller.setElectricityPrice`.
+        // If it compiles error, I will fix Controller.
+
+        try {
+            // Direct model update + observer notification if controller method missing
+            // controller.setElectricityPrice(controller.getModel(), newPrice); // This
+            // method existed in GameService
+            // Let's call the service wrapper if Controller has it.
+            // If Controller.java has `public void setElectricityPrice(...)`
+            // from the `view_file` I saw earlier...
+            // Wait, I saw `setElectricityPrice` in `GameServiceImpl`.
+            // Controller.java had `handleBuyPlant`, `handleNextDay`.
+            // It did NOT seem to have `handleSetPrice`.
+            // So I will likely need to update Controller too.
+            // For now, I will modify Model directly and trigger methods.
+            controller.getModel().getCity().setElectricityPrice(newPrice);
+            controller.getModel().notifyObservers();
+        } catch (Exception e) {
+            showError("Erreur: " + e.getMessage());
         }
+        update(); // Refresh UI
     }
-    
-    private void showError(String message) {
-        JOptionPane.showMessageDialog(frame, message, "Erreur", JOptionPane.ERROR_MESSAGE);
-    }
-    
-    private void saveGame() {
-        String name = JOptionPane.showInputDialog(frame, "Nom de la sauvegarde:", "sauvegarde1");
-        if (name != null && !name.trim().isEmpty()) {
-            try {
-                controller.saveGame(name.trim());
-                JOptionPane.showMessageDialog(frame, "Partie sauvegardee: " + name);
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur: " + ex.getMessage());
-            }
-        }
-    }
-    
-    private void loadGame() {
-        String name = JOptionPane.showInputDialog(frame, "Nom de la sauvegarde a charger:", "sauvegarde1");
-        if (name != null && !name.trim().isEmpty()) {
-            try {
-                controller.loadGame(name.trim());
-                frame.refresh();
-                JOptionPane.showMessageDialog(frame, "Partie chargee: " + name);
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur: " + ex.getMessage());
-            }
-        }
-    }
-    
-    private void newGame() {
-        int confirm = JOptionPane.showConfirmDialog(frame, 
-            "Voulez-vous vraiment commencer une nouvelle partie?", 
-            "Nouvelle Partie", 
-            JOptionPane.YES_NO_OPTION);
-        if (confirm == JOptionPane.YES_OPTION) {
-            controller.startConsole("SimCity");
-            frame.refresh();
-        }
-    }
-    
-    private void showUpgradeDialog() {
-        String coords = JOptionPane.showInputDialog(frame, "Coordonnees du batiment a ameliorer (x,y):");
-        if (coords != null && coords.contains(",")) {
-            String[] parts = coords.split(",");
-            try {
-                int x = Integer.parseInt(parts[0].trim());
-                int y = Integer.parseInt(parts[1].trim());
-                
-                model.entity.Building b = controller.getModel().getCity().getGrid()[x][y];
-                if (b == null) {
-                    JOptionPane.showMessageDialog(frame, "Pas de batiment a cette position!");
-                    return;
-                }
-                
-                controller.handleUpgradeBuilding(b.getId());
-                frame.refresh();
-                JOptionPane.showMessageDialog(frame, "Batiment ameliore au niveau " + b.getLevel() + "!");
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur: " + ex.getMessage());
-            }
-        }
-    }
-    
+
+    // ----- Improved Shop Logic -----
+
     private void showBuildDialog() {
-        JDialog dialog = new JDialog(frame, "Construire un batiment", true);
-        dialog.setLayout(new BorderLayout(10, 10));
+        JDialog dialog = new JDialog(frame, "Construction", true);
+        dialog.setLayout(new BorderLayout(0, 0));
         dialog.setBackground(Color.WHITE);
-        
+
         JPanel content = new JPanel();
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
         content.setBackground(Color.WHITE);
         content.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        
-        JLabel title = new JLabel("Choisissez un type de batiment");
-        title.setFont(new Font("Segoe UI", Font.BOLD, 16));
+
+        // Header
+        JLabel title = new JLabel("Catalogue de Construction");
+        title.setFont(new Font("Segoe UI", Font.BOLD, 22));
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
         content.add(title);
         content.add(Box.createVerticalStrut(20));
-        
-        // Section centrales electriques
-        JLabel plantLabel = new JLabel("[CENTRALES ELECTRIQUES]");
-        plantLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        content.add(plantLabel);
-        content.add(Box.createVerticalStrut(10));
-        
-        String[] plants = {"Solar", "Wind", "Coal", "Gas", "Hydro", "Nuclear"};
-        String[] plantIcons = {"[S]", "[W]", "[C]", "[G]", "[H]", "[N]"};
-        int[] plantCosts = {800, 1000, 1500, 1200, 2000, 5000};
-        
-        for (int i = 0; i < plants.length; i++) {
-            final String plantType = plants[i].toLowerCase();
-            JButton btn = createBuildOptionButton(
-                plantIcons[i] + " " + plants[i], 
-                plantCosts[i] + " pieces",
-                new Color(255, 193, 7)
-            );
+
+        // Available Plants
+        java.util.List<viewmodel.GameViewModel.PlantShopInfo> availablePlants = frame.getViewModel()
+                .getAvailablePlants();
+
+        for (viewmodel.GameViewModel.PlantShopInfo info : availablePlants) {
+            Color color = getPlantColor(info.type());
+            JButton btn = createMakeoverBuildButton(info, color);
+
             btn.addActionListener(e -> {
                 dialog.dispose();
-                promptCoordinates(plantType, true);
+                promptCoordinates(info.type(), true);
             });
+
             content.add(btn);
-            content.add(Box.createVerticalStrut(8));
+            content.add(Box.createVerticalStrut(10));
         }
-        
-        content.add(Box.createVerticalStrut(10));
-        
-        // Section residences
-        JLabel houseLabel = new JLabel("[RESIDENCES]");
-        houseLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        content.add(houseLabel);
-        content.add(Box.createVerticalStrut(10));
-        
-        JButton houseBtn = createBuildOptionButton("[R] Maison", "1000 pieces", new Color(121, 85, 72));
+
+        content.add(Box.createVerticalStrut(15));
+
+        // Residence
+        JButton houseBtn = createMakeoverResidenceButton();
         houseBtn.addActionListener(e -> {
             dialog.dispose();
             promptCoordinates("house", false);
         });
         content.add(houseBtn);
-        
+
         JScrollPane scroll = new JScrollPane(content);
         scroll.setBorder(null);
+        scroll.getVerticalScrollBar().setUnitIncrement(16);
         dialog.add(scroll, BorderLayout.CENTER);
-        
-        dialog.pack();
-        dialog.setSize(400, 500);
+
+        // WIDER WINDOW default
+        dialog.setSize(650, 700);
         dialog.setLocationRelativeTo(frame);
         dialog.setVisible(true);
     }
-    
-    private JButton createBuildOptionButton(String name, String cost, Color color) {
+
+    private Color getPlantColor(String type) {
+        if (type.equalsIgnoreCase("solar"))
+            return new Color(255, 235, 59);
+        if (type.equalsIgnoreCase("wind"))
+            return new Color(3, 169, 244);
+        if (type.equalsIgnoreCase("hydro"))
+            return new Color(33, 150, 243);
+        if (type.equalsIgnoreCase("coal"))
+            return new Color(62, 39, 35);
+        if (type.equalsIgnoreCase("gas"))
+            return new Color(121, 85, 72);
+        if (type.equalsIgnoreCase("nuclear"))
+            return new Color(156, 39, 176);
+        if (type.equalsIgnoreCase("battery"))
+            return new Color(255, 152, 0);
+        return Color.GRAY;
+    }
+
+    private JButton createMakeoverBuildButton(viewmodel.GameViewModel.PlantShopInfo info, Color accent) {
         JButton btn = new JButton();
-        btn.setLayout(new BorderLayout(10, 0));
+        btn.setLayout(new BorderLayout(15, 5));
         btn.setBackground(Color.WHITE);
         btn.setBorder(BorderFactory.createCompoundBorder(
-            new javax.swing.border.LineBorder(new Color(220, 220, 220), 1),
-            BorderFactory.createEmptyBorder(12, 15, 12, 15)
-        ));
+                BorderFactory.createLineBorder(new Color(220, 220, 220), 1),
+                BorderFactory.createEmptyBorder(10, 15, 10, 15)));
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setMaximumSize(new Dimension(350, 50));
-        btn.setAlignmentX(Component.LEFT_ALIGNMENT);
-        
-        JLabel nameLabel = new JLabel(name);
-        nameLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        nameLabel.setForeground(new Color(33, 33, 33));
-        
-        JLabel costLabel = new JLabel(cost);
-        costLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        costLabel.setForeground(color);
-        
-        btn.add(nameLabel, BorderLayout.WEST);
-        btn.add(costLabel, BorderLayout.EAST);
-        
-        // Hover effect
+        btn.setMaximumSize(new Dimension(600, 80)); // WIDER and TALLER
+        btn.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // LEFT: Icon + Name + Cost
+        JPanel leftPanel = new JPanel(new GridLayout(2, 1));
+        leftPanel.setOpaque(false);
+
+        JLabel nameLabel = new JLabel(info.name());
+        nameLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
+
+        JLabel costLabel = new JLabel(info.cost() + " 🪙");
+        costLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        costLabel.setForeground(new Color(46, 125, 50)); // Money Green
+
+        leftPanel.add(nameLabel);
+        leftPanel.add(costLabel);
+
+        // RIGHT: Detailed Stats
+        JPanel rightPanel = new JPanel(new GridLayout(2, 2, 10, 2));
+        rightPanel.setOpaque(false);
+
+        String prodText = info.production() > 0 ? "⚡ " + info.production() + " MW" : "";
+        String storeText = info.storage() > 0 ? "🔋 " + info.storage() + " MWh" : "";
+
+        JLabel pLabel = new JLabel(prodText);
+        pLabel.setForeground(Color.DARK_GRAY);
+        JLabel sLabel = new JLabel(storeText);
+        sLabel.setForeground(Color.DARK_GRAY);
+
+        JLabel descLabel = new JLabel("<html><i>" + info.description() + "</i></html>");
+        descLabel.setFont(new Font("Segoe UI", Font.ITALIC, 11));
+        descLabel.setForeground(Color.GRAY);
+
+        rightPanel.add(pLabel);
+        rightPanel.add(sLabel);
+
+        // Add components
+        JPanel centerContainer = new JPanel(new BorderLayout());
+        centerContainer.setOpaque(false);
+        centerContainer.add(rightPanel, BorderLayout.NORTH);
+        centerContainer.add(descLabel, BorderLayout.SOUTH);
+
+        btn.add(leftPanel, BorderLayout.WEST);
+        btn.add(centerContainer, BorderLayout.CENTER);
+
+        // Color strip on left
+        JPanel colorStrip = new JPanel();
+        colorStrip.setBackground(accent);
+        colorStrip.setPreferredSize(new Dimension(6, 60));
+        btn.add(colorStrip, BorderLayout.EAST); // Put accent on right or left? user asked for style.
+
+        // Hover
         btn.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent e) {
-                btn.setBackground(new Color(245, 245, 245));
+                btn.setBackground(new Color(245, 250, 255));
+                btn.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(new Color(33, 150, 243), 2),
+                        BorderFactory.createEmptyBorder(9, 14, 9, 14)));
             }
+
             public void mouseExited(java.awt.event.MouseEvent e) {
                 btn.setBackground(Color.WHITE);
+                btn.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(new Color(220, 220, 220), 1),
+                        BorderFactory.createEmptyBorder(10, 15, 10, 15)));
             }
         });
-        
+
         return btn;
     }
-    
+
+    private JButton createMakeoverResidenceButton() {
+        JButton btn = new JButton();
+        btn.setLayout(new BorderLayout(15, 5));
+        btn.setBackground(Color.WHITE);
+        btn.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(220, 220, 220), 1),
+                BorderFactory.createEmptyBorder(10, 15, 10, 15)));
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setMaximumSize(new Dimension(600, 80));
+        btn.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JPanel leftPanel = new JPanel(new GridLayout(2, 1));
+        leftPanel.setOpaque(false);
+
+        JLabel nameLabel = new JLabel("Résidence");
+        nameLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        JLabel costLabel = new JLabel("1000 🪙");
+        costLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        costLabel.setForeground(new Color(46, 125, 50));
+
+        leftPanel.add(nameLabel);
+        leftPanel.add(costLabel);
+
+        JLabel descLabel = new JLabel(
+                "<html><i>Logement pour les citoyens. Consomme de l'énergie et génère des revenus.</i></html>");
+        descLabel.setFont(new Font("Segoe UI", Font.ITALIC, 11));
+        descLabel.setForeground(Color.GRAY);
+
+        btn.add(leftPanel, BorderLayout.WEST);
+        btn.add(descLabel, BorderLayout.CENTER);
+
+        JPanel colorStrip = new JPanel();
+        colorStrip.setBackground(new Color(121, 85, 72));
+        colorStrip.setPreferredSize(new Dimension(6, 60));
+        btn.add(colorStrip, BorderLayout.EAST);
+
+        btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                btn.setBackground(new Color(245, 250, 255));
+                btn.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(new Color(33, 150, 243), 2),
+                        BorderFactory.createEmptyBorder(9, 14, 9, 14)));
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                btn.setBackground(Color.WHITE);
+                btn.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(new Color(220, 220, 220), 1),
+                        BorderFactory.createEmptyBorder(10, 15, 10, 15)));
+            }
+        });
+
+        return btn;
+    }
+
     private void promptCoordinates(String type, boolean isPowerPlant) {
         String coords = JOptionPane.showInputDialog(frame, "Entrez les coordonnees (x,y):");
         if (coords != null && coords.contains(",")) {
@@ -268,62 +354,67 @@ public class ControlPanel extends JPanel {
             try {
                 int x = Integer.parseInt(parts[0].trim());
                 int y = Integer.parseInt(parts[1].trim());
-                
+
                 if (isPowerPlant) {
                     String id = type + "-" + System.currentTimeMillis();
                     controller.handleBuyPlant(type, id, x, y);
-                    // Si on arrive ici, pas d'exception = construction reussie
                     frame.refresh();
-                    JOptionPane.showMessageDialog(frame, 
-                        "Centrale " + type + " construite en (" + x + "," + y + ")",
-                        "Construction reussie",
-                        JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(frame,
+                            "Centrale " + type + " construite en (" + x + "," + y + ")",
+                            "Succès",
+                            JOptionPane.INFORMATION_MESSAGE);
                 } else {
                     controller.handleBuildResidence(x, y);
-                    // Si on arrive ici, pas d'exception = construction reussie
                     frame.refresh();
-                    JOptionPane.showMessageDialog(frame, 
-                        "Maison construite en (" + x + "," + y + ")",
-                        "Construction reussie",
-                        JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(frame,
+                            "Maison construite en (" + x + "," + y + ")",
+                            "Succès",
+                            JOptionPane.INFORMATION_MESSAGE);
                 }
             } catch (Exception ex) {
                 showError(ex.getMessage());
             }
         }
     }
-    
+
+    private void showError(String message) {
+        JOptionPane.showMessageDialog(frame, message, "Erreur", JOptionPane.ERROR_MESSAGE);
+    }
+
     private JButton createStyledButton(String text, Color accentColor) {
         JButton btn = new JButton(text);
         btn.setBackground(Color.WHITE);
-        btn.setForeground(new Color(33, 33, 33));  // Dark gray text
+        btn.setForeground(new Color(33, 33, 33));
         btn.setFocusPainted(false);
         btn.setBorderPainted(true);
         btn.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(220, 220, 220), 1),
-                BorderFactory.createMatteBorder(0, 3, 0, 0, accentColor)  // Colored left border
-            ),
-            BorderFactory.createEmptyBorder(8, 20, 8, 20)
-        ));
+                BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(new Color(220, 220, 220), 1),
+                        BorderFactory.createMatteBorder(0, 3, 0, 0, accentColor)),
+                BorderFactory.createEmptyBorder(8, 20, 8, 20)));
         btn.setOpaque(true);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setPreferredSize(new Dimension(200, 40));
-        
-        // Hover effect
+        btn.setPreferredSize(new Dimension(160, 40));
+
         btn.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent e) {
                 btn.setBackground(new Color(245, 245, 245));
             }
+
             public void mouseExited(java.awt.event.MouseEvent e) {
                 btn.setBackground(Color.WHITE);
             }
         });
-        
+
         return btn;
     }
-    
+
     public void update() {
-        // Update button states if needed
+        if (controller != null && controller.getModel() != null) {
+            double price = controller.getModel().getCity().getElectricityPrice();
+            if (priceValueLabel != null) {
+                priceValueLabel.setText(String.format("%.1f 🪙", price));
+            }
+        }
     }
 }

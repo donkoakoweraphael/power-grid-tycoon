@@ -7,6 +7,7 @@ import model.entity.PowerPlant;
  * Fast construction, stable and modular production, less polluting than coal.
  */
 public class NaturalGasPlant extends PowerPlant {
+    private static final long serialVersionUID = 1L;
 
     // ========== Class Variables (Static) ==========
 
@@ -18,8 +19,8 @@ public class NaturalGasPlant extends PowerPlant {
     public static final int DEFAULT_MAX_LEVEL = 5;
 
     // Stats at level 1
-    public static final double BASE_POWER_OUTPUT = 15.0; // Reduced for game balance
-    public static final double BASE_STORAGE_CAPACITY = 25.0;
+    public static final double BASE_POWER_OUTPUT = 250.0; // Boosted x16.6 (was 15.0)
+    public static final double BASE_STORAGE_CAPACITY = 375.0; // Boosted x15 (was 25.0)
     public static final double BASE_DAILY_COST = 375.0; // Higher cost (fuel expenses)
     public static final double BASE_POLLUTION_RATE = 50.0;
 
@@ -54,5 +55,41 @@ public class NaturalGasPlant extends PowerPlant {
     @Override
     public String getShopDescription() {
         return DESCRIPTION;
+    }
+
+    // ========== Upgrade Constants Implementation ==========
+    @Override
+    public double getPowerOutputGrowthRate() {
+        return POWER_OUTPUT_GROWTH_RATE;
+    }
+
+    @Override
+    public double getStorageGrowthRate() {
+        return STORAGE_GROWTH_RATE;
+    }
+
+    @Override
+    public double getDailyCostGrowthRate() {
+        return DAILY_COST_GROWTH_RATE;
+    }
+
+    @Override
+    public double getPollutionReductionRate() {
+        return POLLUTION_REDUCTION_RATE;
+    }
+
+    @Override
+    public double getUpgradeCostMultiplier() {
+        return UPGRADE_COST_MULTIPLIER;
+    }
+
+    @Override
+    public int getUpgradeTimeBase() {
+        return UPGRADE_TIME_BASE;
+    }
+
+    @Override
+    public double getUpgradeCostBase() {
+        return UPGRADE_COST_BASE;
     }
 }

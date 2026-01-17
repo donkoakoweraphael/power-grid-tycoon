@@ -8,6 +8,7 @@ import model.enums.PlantStatus;
  * Acts as a data container for power plant state.
  */
 public abstract class PowerPlant extends Building {
+    private static final long serialVersionUID = 1L;
 
     // ========== Class Variables (Static) - Default Values ==========
 
@@ -164,6 +165,25 @@ public abstract class PowerPlant extends Building {
     public abstract String getShopName();
 
     public abstract String getShopDescription();
+
+    // ========== Upgrade Constants (Polymorphism) ==========
+    public abstract double getPowerOutputGrowthRate();
+
+    public abstract double getStorageGrowthRate();
+
+    public abstract double getDailyCostGrowthRate();
+
+    public abstract double getPollutionReductionRate();
+
+    public abstract double getUpgradeCostMultiplier();
+
+    // Some plants might have different upgrade times, but for now we can default or
+    // abstract it
+    // Let's abstract it or use the base if not needed. The plan said
+    // 'getUpgradeTimeBase'.
+    public abstract int getUpgradeTimeBase();
+
+    public abstract double getUpgradeCostBase();
 
     // ========== Setters ==========
 
