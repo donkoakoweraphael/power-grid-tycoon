@@ -81,6 +81,10 @@ public class GameServiceImpl implements GameService {
         city.addPowerPlant(plant); // This also updates the grid 
 
         powerPlantService.prepareNextLevelStats(plant);
+        
+        // Log event
+        city.addEvent("Construction: " + plant.getClass().getSimpleName() + " a (" + x + "," + y + ")");
+        
         model.notifyObservers();
         saveGame(model, "autosave");
     }
@@ -112,6 +116,9 @@ public class GameServiceImpl implements GameService {
         residence.setCurrentOccupancy(initialOccupancy);
         
         city.addResidence(residence);
+        
+        // Log event
+        city.addEvent("Construction: Maison a (" + x + "," + y + ") - " + initialOccupancy + " habitants");
 
         model.notifyObservers();
         saveGame(model, "autosave");

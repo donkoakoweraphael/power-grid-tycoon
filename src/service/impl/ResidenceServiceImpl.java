@@ -29,14 +29,14 @@ public class ResidenceServiceImpl implements ResidenceService {
         // Randomize within bounds
         double baseDemand = demandMin + (demandMax - demandMin) * Math.random();
         
+        // Multiply by 10 for better game balance (houses need ~0.5 MW each)
+        baseDemand *= 10.0;
+        
         // Add User's "Chaos Factor" (+/- 5 variance?)
-        // Assuming unit is MWh, 5 is huge. If unit is arbitrary score, 5 is fine.
-        // Let's implement it as a +/- 5% variance for realism, or flat 5 units if requested explicitly.
-        // User said "variable plus ou moins 5". Assuming units.
         double variance = (Math.random() * 10.0) - 5.0; // [-5, +5]
         
         // Ensure demand doesn't go negative
-        residence.setEnergyDemand(Math.max(0.1, baseDemand + (variance * 0.001))); // Scaled down if MWh, or keep raw if "units"
+        residence.setEnergyDemand(Math.max(0.1, baseDemand + (variance * 0.001)));
 
         residence.setPurchasingPower(powerMin + (powerMax - powerMin) * Math.random());
     }
@@ -86,9 +86,8 @@ public class ResidenceServiceImpl implements ResidenceService {
         if (residence.getLevel() < residence.getMaxLevel()) {
             residence.setLevel(residence.getLevel() + 1);
 
-            // New capacity
-            int newMax = (int) (Residence.BASE_MAX_CAPACITY
-                    * Math.pow(Residence.CAPACITY_GROWTH_RATE, residence.getLevel() - 1));
+            // Simple x2 multiplier per level
+            int newMax = residence.getMaxCapacity() * 2;
             residence.setMaxCapacity(newMax);
 
             // Immediately regenerate values for new level

@@ -57,11 +57,11 @@ public class PowerPlantServiceImpl implements PowerPlantService {
         if (plant.getLevel() < plant.getMaxLevel()) {
             plant.setLevel(plant.getLevel() + 1);
 
-            // Stats growth based on constants
-            plant.setPowerOutput(plant.getPowerOutput() * PowerPlant.POWER_OUTPUT_GROWTH_RATE);
-            plant.setStorageCapacity(plant.getStorageCapacity() * PowerPlant.STORAGE_GROWTH_RATE);
-            plant.setDailyCost(plant.getDailyCost() * PowerPlant.DAILY_COST_GROWTH_RATE);
-            plant.setPollutionRate(plant.getPollutionRate() * PowerPlant.POLLUTION_REDUCTION_RATE);
+            // Simple x2 multiplier per level
+            plant.setPowerOutput(plant.getPowerOutput() * 2.0);
+            plant.setStorageCapacity(plant.getStorageCapacity() * 2.0);
+            plant.setDailyCost(plant.getDailyCost() * 2.0);
+            plant.setPollutionRate(plant.getPollutionRate() * 2.0); // Pollution also doubles
 
             // Prepare stats for the NEXT level upgrade
             prepareNextLevelStats(plant);

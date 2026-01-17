@@ -1,18 +1,44 @@
 import controller.GameController;
+import view.swing.GameFrame;
 import java.util.Scanner;
 
 /**
- * Entry point for the Power Grid Tycoon game (Console Version).
+ * Entry point for Power Grid Tycoon.
+ * Choose between Console or Swing UI.
  */
 public class Main {
     public static void main(String[] args) {
+        System.out.println("=== Power Grid Tycoon ===");
+        System.out.println("1. Mode Console");
+        System.out.println("2. Mode Interface Graphique");
+        System.out.print("Choisissez le mode (1 ou 2): ");
+        
+        Scanner scanner = new Scanner(System.in);
+        String choice = scanner.nextLine();
+        
+        if (choice.equals("2")) {
+            launchSwingUI();
+        } else {
+            launchConsole(scanner);
+        }
+    }
+    
+    private static void launchSwingUI() {
+        GameController controller = new GameController();
+        controller.startConsole("SimCity");
+        
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            new GameFrame(controller, controller.getModel());
+        });
+    }
+    
+    private static void launchConsole(Scanner scanner) {
         GameController controller = new GameController();
         System.out.println("Starting Power Grid Tycoon Engine...");
         
         controller.startConsole("SimCity");
         
         // Simple Loop for testing
-        Scanner scanner = new Scanner(System.in);
         while(true) {
             System.out.println("\nCommands: [n]ext, [m]ap, [i]nfo <x> <y>, [b]uy <type> <x> <y>, build [h]ouse <x> <y>, [u]pgrade <id>, [q]uit");
             System.out.print("> ");

@@ -17,6 +17,10 @@ public class GameController {
     public GameController() {
         this.gameService = new GameServiceImpl();
     }
+    
+    public GameModel getModel() {
+        return model;
+    }
 
     public void startConsole(String cityName) {
         this.model = gameService.createNewGame(cityName);
