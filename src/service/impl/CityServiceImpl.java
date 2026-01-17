@@ -52,6 +52,9 @@ public class CityServiceImpl implements CityService {
         // Fluctuations (New day base values)
         city.getResidences().forEach(residenceService::regenerateDailyValues);
 
+        // Population Growth (Once per day)
+        city.getResidences().forEach(r -> residenceService.updateOccupancy(r, city.getGlobalHappiness()));
+
         // Urban expansion every day (User request: was 7 days)
         // No need for modulo check if it's every day, or strictly check == 1 day if we
         // want it every day?
@@ -63,12 +66,7 @@ public class CityServiceImpl implements CityService {
     @Override
     public void calculateGlobalMetrics(City city) {
         int population = city.getResidences().stream()
-                .mapToInt(r -> {
-                    if (city.getCurrentDay() % model.entity.Residence.GROWTH_CYCLE_DAYS == 0) {
-                        residenceService.updateOccupancy(r, city.getGlobalHappiness());
-                    }
-                    return r.getCurrentOccupancy();
-                }).sum();
+                .mapToInt(model.entity.Residence::getCurrentOccupancy).sum();
 
         double demand = city.getResidences().stream()
                 .mapToDouble(r -> {
@@ -296,12 +294,48 @@ public class CityServiceImpl implements CityService {
             // Phase 2: Build new residences if still tight
             if (city.getTotalPopulation() >= newTotalCapacity * City.SATURATION_THRESHOLD_EXPAND) {
                 int countToBuild = 2; // Build 2 new residences per expansion phase
+
                 for (int i = 0; i < countToBuild; i++) {
-                    String id = "res-" + city.getResidences().size() + "-" + city.getCurrentDay();
-                    city.addResidence(new model.entity.Residence(id));
+                    java.awt.Point freeSpot = findFreeGridPosition(city);
+
+                    if (freeSpot != null) {
+                        String id = "res-auto-" + city.getCurrentDay() + "-" + System.currentTimeMillis() + "-" + i;
+                        model.entity.Residence res = new model.entity.Residence(id);
+                        res.setPosition(freeSpot.x, freeSpot.y);
+
+                        // Initial setup for the new residence
+                        residenceService.regenerateDailyValues(res);
+                        res.setCurrentOccupancy(5); // Initial families moving in
+
+                        city.addResidence(res);
+                        city.addEvent("Expansion: New Residence auto-built at (" + freeSpot.x + "," + freeSpot.y + ")");
+                    } else {
+                        city.addEvent("Expansion Stalled: No free space on grid!");
+                        break;
+                    }
                 }
             }
         }
+    }
+
+    private java.awt.Point findFreeGridPosition(City city) {
+        // Spiral search or simple linear search for empty spot
+        // Let's look for a spot adjacent to existing buildings for organic growth
+        // Simple heuristic: Line by line (or random?)
+        // Better: Scan grid, find clear spot.
+
+        int w = city.getWidth();
+        int h = city.getHeight();
+
+        // Strategy: Fill from Top-Left to Bottom-Right
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                if (!city.isCellOccupied(x, y)) {
+                    return new java.awt.Point(x, y);
+                }
+            }
+        }
+        return null;
     }
 
     private void handleRandomEvents(City city) {

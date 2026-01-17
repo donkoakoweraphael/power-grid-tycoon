@@ -281,7 +281,6 @@ public class InfoPanel extends JPanel {
         btn.setBackground(new Color(156, 39, 176));
         btn.setForeground(Color.WHITE);
         btn.setFocusPainted(false);
-        // Fix for linux visibility
         btn.setOpaque(true);
         btn.setBorderPainted(false);
         btn.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
@@ -289,20 +288,48 @@ public class InfoPanel extends JPanel {
         btn.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         btn.addActionListener(e -> {
-            try {
-                controller.handleUpgradeBuilding(b.getId());
-                frame.refresh();
-                // Re-show updated building info
-                showBuildingInfo(b, selectedX, selectedY);
-                JOptionPane.showMessageDialog(frame,
-                        "Batiment ameliore au niveau " + b.getLevel() + "!",
-                        "Amelioration reussie",
-                        JOptionPane.INFORMATION_MESSAGE);
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame,
-                        "Erreur: " + ex.getMessage(),
-                        "Erreur",
-                        JOptionPane.ERROR_MESSAGE);
+            // Preview Stats Logic
+            StringBuilder msg = new StringBuilder();
+            msg.append("<html><b>Confirmer l'amelioration vers Niveau ").append(b.getLevel() + 1)
+                    .append(" ?</b><br><br>");
+            msg.append("Cout: <font color='red'>-").append((int) cost).append(" 🪙</font><br>");
+
+            if (b instanceof PowerPlant) {
+                PowerPlant p = (PowerPlant) b;
+                double nextOutput = p.getPowerOutput() * p.getPowerOutputGrowthRate();
+                double nextStorage = p.getStorageCapacity() * p.getStorageGrowthRate();
+                double nextCost = p.getDailyCost() * p.getDailyCostGrowthRate();
+
+                msg.append(String.format("Production: %.1f -> <b>%.1f MW</b><br>", p.getPowerOutput(), nextOutput));
+                msg.append(String.format("Stockage: %.0f -> <b>%.0f MWh</b><br>", p.getStorageCapacity(), nextStorage));
+                msg.append(String.format("Cout journalier: %.0f -> <b>%.0f 🪙</b><br>", p.getDailyCost(), nextCost));
+            } else if (b instanceof Residence) {
+                Residence r = (Residence) b;
+                int nextCap = (int) (r.getMaxCapacity() * Residence.CAPACITY_GROWTH_RATE);
+                double nextDemand = r.getEnergyDemand() * Residence.DEMAND_GROWTH_RATE;
+
+                msg.append(String.format("Habitants Max: %d -> <b>%d</b><br>", r.getMaxCapacity(), nextCap));
+                msg.append(String.format("Demande: %.2f -> <b>%.2f MW</b><br>", r.getEnergyDemand(), nextDemand));
+            }
+
+            msg.append("</html>");
+
+            int choice = JOptionPane.showConfirmDialog(frame, msg.toString(), "Confirmation Amelioration",
+                    JOptionPane.YES_NO_OPTION);
+
+            if (choice == JOptionPane.YES_OPTION) {
+                try {
+                    controller.handleUpgradeBuilding(b.getId());
+                    frame.refresh();
+                    showBuildingInfo(b, selectedX, selectedY);
+
+                    // No need for generic success message if visual feedback is clear
+                    // But user asked for personalized messages, maybe success message too?
+                    // Let's stick to the preview as the main "personalized" interaction.
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(frame, "Erreur: " + ex.getMessage(), "Erreur",
+                            JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 

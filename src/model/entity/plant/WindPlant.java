@@ -22,13 +22,13 @@ public class WindPlant extends PowerPlant {
     // Stats at level 1
     public static final double BASE_POWER_OUTPUT = 90.0; // Boosted x15 (was 6.0)
     public static final double BASE_STORAGE_CAPACITY = 270.0; // Boosted x15 (was 18.0)
-    public static final double BASE_DAILY_COST = 250.0; // More expensive than solar
+    public static final double BASE_DAILY_COST = 650.0; // Increased
     public static final double BASE_POLLUTION_RATE = 0.0; // Eco-friendly
 
     // Growth rates per level
     public static final double POWER_OUTPUT_GROWTH_RATE = 1.48; // +48% per level
     public static final double STORAGE_GROWTH_RATE = 1.42; // +42% per level
-    public static final double DAILY_COST_GROWTH_RATE = 1.18; // +18% per level
+    public static final double DAILY_COST_GROWTH_RATE = 2.10; // +110% per level (> 2.0)
     public static final double POLLUTION_REDUCTION_RATE = 1.0; // No pollution, no change
 
     // Upgrade
@@ -46,6 +46,11 @@ public class WindPlant extends PowerPlant {
     public WindPlant(String id) {
         super(id, BASE_POWER_OUTPUT, BASE_STORAGE_CAPACITY, BASE_DAILY_COST,
                 BASE_POLLUTION_RATE, BASE_CONSTRUCTION_COST, BASE_CONSTRUCTION_TIME, DEFAULT_MAX_LEVEL);
+    }
+
+    @Override
+    public String getGridCode() {
+        return "WIND";
     }
 
     @Override

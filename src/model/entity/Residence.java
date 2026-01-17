@@ -32,7 +32,7 @@ public class Residence extends Building {
     public static final double PURCHASING_POWER_GROWTH_RATE = 1.15; // +15% purchasing power/level
 
     // Population Dynamics
-    public static final int GROWTH_CYCLE_DAYS = 7;
+    public static final int GROWTH_CYCLE_DAYS = 1;
     public static final double MIN_GROWTH_RATE = 0.02; // 2%
     public static final double MAX_GROWTH_RATE = 0.10; // 10%
     public static final double MIN_DECAY_RATE = 0.05; // 5%
@@ -163,6 +163,11 @@ public class Residence extends Building {
     }
 
     // ========== Standard Methods ==========
+
+    @Override
+    public String getGridCode() {
+        return "RES";
+    }
 
     @Override
     public String toString() {

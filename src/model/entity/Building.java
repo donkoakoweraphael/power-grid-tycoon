@@ -96,6 +96,10 @@ public abstract class Building implements Serializable {
 
     // ========== Standard Methods ==========
 
+    public String getGridCode() {
+        return "?";
+    }
+
     @Override
     public String toString() {
         return "Building{" +

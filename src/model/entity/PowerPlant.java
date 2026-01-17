@@ -226,6 +226,11 @@ public abstract class PowerPlant extends Building {
     // ========== Standard Methods ==========
 
     @Override
+    public String getGridCode() {
+        return "PWR";
+    }
+
+    @Override
     public String toString() {
         return "PowerPlant{" +
                 "id='" + id + '\'' +

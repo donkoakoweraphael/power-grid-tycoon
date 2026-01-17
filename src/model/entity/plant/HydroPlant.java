@@ -22,13 +22,13 @@ public class HydroPlant extends PowerPlant {
     // Stats at level 1
     public static final double BASE_POWER_OUTPUT = 200.0; // Boosted x16.6 (was 12.0)
     public static final double BASE_STORAGE_CAPACITY = 2700.0; // Boosted x15 (was 180.0) - Massive reservoir
-    public static final double BASE_DAILY_COST = 300.0; // Moderate cost
+    public static final double BASE_DAILY_COST = 800.0; // Increased
     public static final double BASE_POLLUTION_RATE = 0.0; // Eco-friendly
 
     // Growth rates per level
     public static final double POWER_OUTPUT_GROWTH_RATE = 1.38; // +38% per level
     public static final double STORAGE_GROWTH_RATE = 1.50; // +50% per level (expand reservoir)
-    public static final double DAILY_COST_GROWTH_RATE = 1.15; // +15% per level
+    public static final double DAILY_COST_GROWTH_RATE = 2.10; // +110% per level (> 2.0)
     public static final double POLLUTION_REDUCTION_RATE = 1.0; // No pollution, no change
 
     // Upgrade
@@ -46,6 +46,11 @@ public class HydroPlant extends PowerPlant {
     public HydroPlant(String id) {
         super(id, BASE_POWER_OUTPUT, BASE_STORAGE_CAPACITY, BASE_DAILY_COST,
                 BASE_POLLUTION_RATE, BASE_CONSTRUCTION_COST, BASE_CONSTRUCTION_TIME, DEFAULT_MAX_LEVEL);
+    }
+
+    @Override
+    public String getGridCode() {
+        return "DAM";
     }
 
     @Override
