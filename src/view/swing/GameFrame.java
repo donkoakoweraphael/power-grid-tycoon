@@ -21,14 +21,15 @@ public class GameFrame extends JFrame {
     private ControlPanel controlPanel;
     private InfoPanel infoPanel;
     private BottomStatsPanel bottomStatsPanel;
+    private ChartPanel chartPanel;
     
-    public GameFrame(GameController controller, GameModel model) {
+    public GameFrame(GameController controller, GameModel model, String cityName) {
         this.controller = controller;
         this.model = model;
         
-        setTitle("Power Grid Tycoon - Simulation Energetique");
+        setTitle("Power Grid Tycoon - " + cityName);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new BorderLayout(0, 0));
+        setLayout(new BorderLayout(5, 5));
         
         // Create panels
         gridPanel = new GridPanel(model, this);
@@ -36,14 +37,28 @@ public class GameFrame extends JFrame {
         controlPanel = new ControlPanel(controller, this);
         infoPanel = new InfoPanel(model);
         bottomStatsPanel = new BottomStatsPanel(model);
+        chartPanel = new ChartPanel(model);
+        
+        // Panel gauche avec graphique
+        JPanel leftPanel = new JPanel(new BorderLayout(0, 5));
+        leftPanel.setBackground(new java.awt.Color(245, 245, 245));
+        leftPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 0));
+        
+        JLabel chartTitle = new JLabel("Statistiques", SwingConstants.CENTER);
+        chartTitle.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 14));
+        chartTitle.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
+        
+        leftPanel.add(chartTitle, BorderLayout.NORTH);
+        leftPanel.add(chartPanel, BorderLayout.CENTER);
         
         // Center panel with grid and bottom stats
         JPanel centerPanel = new JPanel(new BorderLayout(0, 0));
         centerPanel.add(gridPanel, BorderLayout.CENTER);
         centerPanel.add(bottomStatsPanel, BorderLayout.SOUTH);
         
-        // Layout
+        // Layout principal
         add(statusPanel, BorderLayout.NORTH);
+        add(leftPanel, BorderLayout.WEST);
         add(centerPanel, BorderLayout.CENTER);
         add(infoPanel, BorderLayout.EAST);
         add(controlPanel, BorderLayout.SOUTH);
@@ -52,18 +67,19 @@ public class GameFrame extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
         
-        // Demarrer l'animation de l'horloge (affichage seulement, ne fait pas avancer le jeu)
+        // Demarrer l'animation de l'horloge
         statusPanel.startClockAnimation();
         
-        // Demarrer l'animation des stats (rafraichir l'UI toutes les 500ms)
+        // Demarrer l'animation des stats
         startStatsAnimation();
     }
     
     private void startStatsAnimation() {
         javax.swing.Timer statsTimer = new javax.swing.Timer(500, e -> {
-            // Mettre a jour l'affichage des stats seulement, ne pas avancer le jeu
+            // Mettre a jour l'affichage des stats seulement
             statusPanel.update();
             bottomStatsPanel.update();
+            chartPanel.update();
         });
         statsTimer.start();
     }
@@ -72,11 +88,36 @@ public class GameFrame extends JFrame {
         // Verifier le game over
         if (model.getState() == GameState.GAME_OVER) {
             statusPanel.stopClockAnimation();
-            javax.swing.JOptionPane.showMessageDialog(this, 
-                "GAME OVER!\n\nBonheur < 5% ou Argent < -10\n\nLa partie est terminee.", 
-                "Fin de partie", 
-                javax.swing.JOptionPane.ERROR_MESSAGE);
-            return;
+            
+            String[] options = {"Charger une sauvegarde", "Nouvelle partie", "Quitter"};
+            int choice = javax.swing.JOptionPane.showOptionDialog(this,
+                "GAME OVER!\n\nBonheur < 5% ou Argent < -10\n\nQue voulez-vous faire?",
+                "Fin de partie",
+                javax.swing.JOptionPane.DEFAULT_OPTION,
+                javax.swing.JOptionPane.ERROR_MESSAGE,
+                null,
+                options,
+                options[0]);
+            
+            if (choice == 0) {
+                // Charger une sauvegarde
+                String name = javax.swing.JOptionPane.showInputDialog(this, "Nom de la sauvegarde:", "sauvegarde1");
+                if (name != null && !name.trim().isEmpty()) {
+                    try {
+                        controller.loadGame(name.trim());
+                        statusPanel.startClockAnimation();
+                    } catch (Exception ex) {
+                        javax.swing.JOptionPane.showMessageDialog(this, "Erreur: " + ex.getMessage());
+                    }
+                }
+            } else if (choice == 1) {
+                // Nouvelle partie
+                controller.startConsole("SimCity");
+                statusPanel.startClockAnimation();
+            } else {
+                // Quitter
+                System.exit(0);
+            }
         }
         
         gridPanel.repaint();
@@ -84,6 +125,7 @@ public class GameFrame extends JFrame {
         controlPanel.update();
         infoPanel.update();
         bottomStatsPanel.update();
+        chartPanel.update();
     }
     
     public void showBuildingInfo(Building b, int x, int y) {

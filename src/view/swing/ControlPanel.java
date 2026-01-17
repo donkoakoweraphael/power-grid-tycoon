@@ -16,17 +16,17 @@ public class ControlPanel extends JPanel {
         this.controller = controller;
         this.frame = frame;
         
-        setLayout(new FlowLayout(FlowLayout.CENTER, 15, 15));
+        setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
         setBackground(new Color(250, 250, 250));
         setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createMatteBorder(2, 0, 0, 0, new Color(200, 200, 200)),
             BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
         
-        Font buttonFont = new Font("Segoe UI", Font.BOLD, 13);
+        Font buttonFont = new Font("Segoe UI", Font.BOLD, 12);
         
         // Bouton heure suivante
-        JButton nextBtn = createStyledButton("> Heure Suivante", new Color(76, 175, 80));
+        JButton nextBtn = createStyledButton("> Suivant", new Color(76, 175, 80));
         nextBtn.setFont(buttonFont);
         nextBtn.addActionListener(e -> {
             controller.handleNextDay();
@@ -34,11 +34,129 @@ public class ControlPanel extends JPanel {
         });
         add(nextBtn);
         
-        // Bouton de construction unifie
+        // Bouton de construction
         JButton buildBtn = createStyledButton("+ Construire", new Color(33, 150, 243));
         buildBtn.setFont(buttonFont);
         buildBtn.addActionListener(e -> showBuildDialog());
         add(buildBtn);
+        
+        // Bouton ameliorer
+        JButton upgradeBtn = createStyledButton("^ Ameliorer", new Color(156, 39, 176));
+        upgradeBtn.setFont(buttonFont);
+        upgradeBtn.addActionListener(e -> showUpgradeDialog());
+        add(upgradeBtn);
+        
+        // Bouton sauvegarder
+        JButton saveBtn = createStyledButton("[S] Sauver", new Color(255, 152, 0));
+        saveBtn.setFont(buttonFont);
+        saveBtn.addActionListener(e -> saveGame());
+        add(saveBtn);
+        
+        // Bouton charger
+        JButton loadBtn = createStyledButton("[L] Charger", new Color(0, 188, 212));
+        loadBtn.setFont(buttonFont);
+        loadBtn.addActionListener(e -> loadGame());
+        add(loadBtn);
+        
+        // Bouton nouvelle partie
+        JButton newBtn = createStyledButton("[N] Nouveau", new Color(244, 67, 54));
+        newBtn.setFont(buttonFont);
+        newBtn.addActionListener(e -> newGame());
+        add(newBtn);
+        
+        // Bouton prix electricite
+        JButton priceBtn = createStyledButton("$ Prix", new Color(76, 175, 80));
+        priceBtn.setFont(buttonFont);
+        priceBtn.addActionListener(e -> showPriceDialog());
+        add(priceBtn);
+    }
+    
+    private void showPriceDialog() {
+        double currentPrice = controller.getModel().getCity().getElectricityPrice();
+        String input = JOptionPane.showInputDialog(frame, 
+            "Prix actuel: " + currentPrice + " pieces/MWh\n\nNouveau prix (1-50):",
+            String.valueOf(currentPrice));
+        
+        if (input != null && !input.trim().isEmpty()) {
+            try {
+                double newPrice = Double.parseDouble(input.trim());
+                if (newPrice < 1 || newPrice > 50) {
+                    showError("Le prix doit etre entre 1 et 50 pieces/MWh");
+                    return;
+                }
+                controller.getModel().getCity().setElectricityPrice(newPrice);
+                JOptionPane.showMessageDialog(frame, 
+                    "Prix de l'electricite modifie: " + newPrice + " pieces/MWh",
+                    "Prix mis a jour", 
+                    JOptionPane.INFORMATION_MESSAGE);
+                frame.refresh();
+            } catch (NumberFormatException ex) {
+                showError("Veuillez entrer un nombre valide");
+            }
+        }
+    }
+    
+    private void showError(String message) {
+        JOptionPane.showMessageDialog(frame, message, "Erreur", JOptionPane.ERROR_MESSAGE);
+    }
+    
+    private void saveGame() {
+        String name = JOptionPane.showInputDialog(frame, "Nom de la sauvegarde:", "sauvegarde1");
+        if (name != null && !name.trim().isEmpty()) {
+            try {
+                controller.saveGame(name.trim());
+                JOptionPane.showMessageDialog(frame, "Partie sauvegardee: " + name);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(frame, "Erreur: " + ex.getMessage());
+            }
+        }
+    }
+    
+    private void loadGame() {
+        String name = JOptionPane.showInputDialog(frame, "Nom de la sauvegarde a charger:", "sauvegarde1");
+        if (name != null && !name.trim().isEmpty()) {
+            try {
+                controller.loadGame(name.trim());
+                frame.refresh();
+                JOptionPane.showMessageDialog(frame, "Partie chargee: " + name);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(frame, "Erreur: " + ex.getMessage());
+            }
+        }
+    }
+    
+    private void newGame() {
+        int confirm = JOptionPane.showConfirmDialog(frame, 
+            "Voulez-vous vraiment commencer une nouvelle partie?", 
+            "Nouvelle Partie", 
+            JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            controller.startConsole("SimCity");
+            frame.refresh();
+        }
+    }
+    
+    private void showUpgradeDialog() {
+        String coords = JOptionPane.showInputDialog(frame, "Coordonnees du batiment a ameliorer (x,y):");
+        if (coords != null && coords.contains(",")) {
+            String[] parts = coords.split(",");
+            try {
+                int x = Integer.parseInt(parts[0].trim());
+                int y = Integer.parseInt(parts[1].trim());
+                
+                model.entity.Building b = controller.getModel().getCity().getGrid()[x][y];
+                if (b == null) {
+                    JOptionPane.showMessageDialog(frame, "Pas de batiment a cette position!");
+                    return;
+                }
+                
+                controller.handleUpgradeBuilding(b.getId());
+                frame.refresh();
+                JOptionPane.showMessageDialog(frame, "Batiment ameliore au niveau " + b.getLevel() + "!");
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(frame, "Erreur: " + ex.getMessage());
+            }
+        }
     }
     
     private void showBuildDialog() {
@@ -154,13 +272,23 @@ public class ControlPanel extends JPanel {
                 if (isPowerPlant) {
                     String id = type + "-" + System.currentTimeMillis();
                     controller.handleBuyPlant(type, id, x, y);
+                    // Si on arrive ici, pas d'exception = construction reussie
+                    frame.refresh();
+                    JOptionPane.showMessageDialog(frame, 
+                        "Centrale " + type + " construite en (" + x + "," + y + ")",
+                        "Construction reussie",
+                        JOptionPane.INFORMATION_MESSAGE);
                 } else {
                     controller.handleBuildResidence(x, y);
+                    // Si on arrive ici, pas d'exception = construction reussie
+                    frame.refresh();
+                    JOptionPane.showMessageDialog(frame, 
+                        "Maison construite en (" + x + "," + y + ")",
+                        "Construction reussie",
+                        JOptionPane.INFORMATION_MESSAGE);
                 }
-                
-                frame.refresh();
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur: " + ex.getMessage());
+                showError(ex.getMessage());
             }
         }
     }

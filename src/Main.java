@@ -33,11 +33,85 @@ public class Main {
             // Fallback to default if system L&F not available
         }
         
-        GameController controller = new GameController();
-        controller.startConsole("SimCity");
+        // Menu principal
+        String[] options = {"Nouvelle Partie", "Charger une Partie", "Quitter"};
+        int choice = javax.swing.JOptionPane.showOptionDialog(
+            null,
+            "Bienvenue dans Power Grid Tycoon!\n\nQue voulez-vous faire?",
+            "Power Grid Tycoon",
+            javax.swing.JOptionPane.DEFAULT_OPTION,
+            javax.swing.JOptionPane.PLAIN_MESSAGE,
+            null,
+            options,
+            options[0]);
         
+        GameController controller = new GameController();
+        String cityName = "SimCity";
+        
+        if (choice == 0) {
+            // Nouvelle partie - demander le nom de la ville
+            cityName = javax.swing.JOptionPane.showInputDialog(
+                null, 
+                "Entrez le nom de votre ville:", 
+                "Nouvelle Partie",
+                javax.swing.JOptionPane.QUESTION_MESSAGE);
+            
+            if (cityName == null || cityName.trim().isEmpty()) {
+                cityName = "SimCity";
+            }
+            controller.startConsole(cityName.trim());
+            
+        } else if (choice == 1) {
+            // Charger une partie - lister les sauvegardes disponibles
+            java.io.File savesDir = new java.io.File("saves");
+            String[] saveFiles = savesDir.list((dir, name) -> name.endsWith(".tycoon"));
+            
+            if (saveFiles == null || saveFiles.length == 0) {
+                javax.swing.JOptionPane.showMessageDialog(null, 
+                    "Aucune sauvegarde trouvee!\n\nDemarrage d'une nouvelle partie.",
+                    "Pas de sauvegarde",
+                    javax.swing.JOptionPane.WARNING_MESSAGE);
+                controller.startConsole("SimCity");
+            } else {
+                // Formatter les noms (retirer .tycoon)
+                String[] saveNames = new String[saveFiles.length];
+                for (int i = 0; i < saveFiles.length; i++) {
+                    saveNames[i] = saveFiles[i].replace(".tycoon", "");
+                }
+                
+                String selectedSave = (String) javax.swing.JOptionPane.showInputDialog(
+                    null,
+                    "Choisissez une sauvegarde:",
+                    "Charger une Partie",
+                    javax.swing.JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    saveNames,
+                    saveNames[0]);
+                
+                if (selectedSave != null) {
+                    try {
+                        controller.startConsole("temp");
+                        controller.loadGame(selectedSave);
+                        cityName = controller.getModel().getCity().getName();
+                    } catch (Exception e) {
+                        javax.swing.JOptionPane.showMessageDialog(null, 
+                            "Erreur lors du chargement: " + e.getMessage(),
+                            "Erreur",
+                            javax.swing.JOptionPane.ERROR_MESSAGE);
+                        controller.startConsole("SimCity");
+                    }
+                } else {
+                    controller.startConsole("SimCity");
+                }
+            }
+        } else {
+            // Quitter
+            System.exit(0);
+        }
+        
+        final String finalCityName = cityName;
         javax.swing.SwingUtilities.invokeLater(() -> {
-            new GameFrame(controller, controller.getModel());
+            new GameFrame(controller, controller.getModel(), finalCityName);
         });
     }
     
@@ -79,8 +153,8 @@ public class Main {
                         int x = Integer.parseInt(parts[2]);
                         int y = Integer.parseInt(parts[3]);
                         controller.handleBuyPlant(type, type + "-" + System.currentTimeMillis(), x, y);
-                    } catch (NumberFormatException e) {
-                        System.out.println("Invalid coordinates.");
+                    } catch (Exception e) {
+                        System.out.println("Erreur: " + e.getMessage());
                     }
                 }
             } else if (input.startsWith("build h ")) {
@@ -91,8 +165,8 @@ public class Main {
                         int x = Integer.parseInt(parts[2]);
                         int y = Integer.parseInt(parts[3]);
                         controller.handleBuildResidence(x, y);
-                    } catch (NumberFormatException e) {
-                        System.out.println("Invalid coordinates.");
+                    } catch (Exception e) {
+                        System.out.println("Erreur: " + e.getMessage());
                     }
                 }
             } else if (input.startsWith("u ")) {

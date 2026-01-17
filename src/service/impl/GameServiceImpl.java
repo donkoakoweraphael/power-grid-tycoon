@@ -40,7 +40,7 @@ public class GameServiceImpl implements GameService {
         
         // Validate Grid Position
         if (city.isCellOccupied(x, y)) {
-            throw new BusinessRuleException("Cannot build here: Cell (" + x + "," + y + ") is occupied or out of bounds.");
+            throw new BusinessRuleException("Construction impossible: Cellule (" + x + "," + y + ") est occupee ou hors limites.");
         }
         
         PowerPlant plant;
@@ -94,7 +94,7 @@ public class GameServiceImpl implements GameService {
         City city = model.getCity();
         
         if (city.isCellOccupied(x, y)) {
-            throw new BusinessRuleException("Cannot build here: Cell (" + x + "," + y + ") is occupied.");
+            throw new BusinessRuleException("Construction impossible: Cellule (" + x + "," + y + ") est occupee.");
         }
         
         double cost = 1000.0; // Fixed cost for now

@@ -69,25 +69,17 @@ public class GameController {
         printStatus();
     }
 
-    public void handleBuyPlant(String type, String id, int x, int y) {
-        try {
-            gameService.buyPowerPlant(model, type, id, x, y);
-            System.out.println("Built " + type + " at (" + x + "," + y + ")");
-            printMap(); // auto-show map
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-        }
+    public void handleBuyPlant(String type, String id, int x, int y) throws Exception {
+        gameService.buyPowerPlant(model, type, id, x, y);
+        System.out.println("Construction: " + type + " en (" + x + "," + y + ")");
+        printMap();
     }
     
-    public void handleBuildResidence(int x, int y) {
-        try {
-            String id = "res-" + System.currentTimeMillis();
-            gameService.buildResidence(model, id, x, y);
-            System.out.println("Built House at (" + x + "," + y + ")");
-            printMap();
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-        }
+    public void handleBuildResidence(int x, int y) throws Exception {
+        String id = "res-" + System.currentTimeMillis();
+        gameService.buildResidence(model, id, x, y);
+        System.out.println("Construction: Maison en (" + x + "," + y + ")");
+        printMap();
     }
 
     public void handleUpgradeBuilding(String id) {
@@ -168,5 +160,20 @@ public class GameController {
             System.out.println();
         }
         System.out.println("================\n");
+    }
+    
+    public void saveGame(String name) {
+        gameService.saveGame(model, name);
+        System.out.println("Partie sauvegardee: " + name);
+    }
+    
+    public void loadGame(String name) {
+        GameModel loaded = gameService.loadGame(name);
+        if (loaded != null) {
+            this.model = loaded;
+            System.out.println("Partie chargee: " + name);
+        } else {
+            throw new RuntimeException("Sauvegarde introuvable: " + name);
+        }
     }
 }
