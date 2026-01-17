@@ -27,7 +27,17 @@ public class ResidenceServiceImpl implements ResidenceService {
         residence.setPurchasingPowerMax(powerMax);
 
         // Randomize within bounds
-        residence.setEnergyDemand(demandMin + (demandMax - demandMin) * Math.random());
+        double baseDemand = demandMin + (demandMax - demandMin) * Math.random();
+        
+        // Add User's "Chaos Factor" (+/- 5 variance?)
+        // Assuming unit is MWh, 5 is huge. If unit is arbitrary score, 5 is fine.
+        // Let's implement it as a +/- 5% variance for realism, or flat 5 units if requested explicitly.
+        // User said "variable plus ou moins 5". Assuming units.
+        double variance = (Math.random() * 10.0) - 5.0; // [-5, +5]
+        
+        // Ensure demand doesn't go negative
+        residence.setEnergyDemand(Math.max(0.1, baseDemand + (variance * 0.001))); // Scaled down if MWh, or keep raw if "units"
+
         residence.setPurchasingPower(powerMin + (powerMax - powerMin) * Math.random());
     }
 

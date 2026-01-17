@@ -19,9 +19,9 @@ public class WindPlant extends PowerPlant {
     public static final int DEFAULT_MAX_LEVEL = 4;
 
     // Stats at level 1
-    public static final double BASE_POWER_OUTPUT = 35.0;
-    public static final double BASE_STORAGE_CAPACITY = 105.0; // 3x ratio for wind variability
-    public static final double BASE_DAILY_COST = 28.0;
+    public static final double BASE_POWER_OUTPUT = 6.0; // Reduced for game balance
+    public static final double BASE_STORAGE_CAPACITY = 18.0; // 3x ratio for wind variability
+    public static final double BASE_DAILY_COST = 250.0; // More expensive than solar (variable output)
     public static final double BASE_POLLUTION_RATE = 0.0; // Eco-friendly
 
     // Growth rates per level

@@ -19,9 +19,9 @@ public class CoalPlant extends PowerPlant {
     public static final int DEFAULT_MAX_LEVEL = 5;
 
     // Stats at level 1
-    public static final double BASE_POWER_OUTPUT = 120.0;
-    public static final double BASE_STORAGE_CAPACITY = 180.0;
-    public static final double BASE_DAILY_COST = 110.0;
+    public static final double BASE_POWER_OUTPUT = 20.0; // Reduced for game balance
+    public static final double BASE_STORAGE_CAPACITY = 30.0;
+    public static final double BASE_DAILY_COST = 500.0; // High cost (fuel + pollution management)
     public static final double BASE_POLLUTION_RATE = 100.0;
 
     // Growth rates per level

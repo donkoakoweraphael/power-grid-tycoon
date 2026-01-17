@@ -35,8 +35,14 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public void buyPowerPlant(GameModel model, String type, String id) {
+    public void buyPowerPlant(GameModel model, String type, String id, int x, int y) {
         City city = model.getCity();
+        
+        // Validate Grid Position
+        if (city.isCellOccupied(x, y)) {
+            throw new BusinessRuleException("Cannot build here: Cell (" + x + "," + y + ") is occupied or out of bounds.");
+        }
+        
         PowerPlant plant;
         switch (type.toLowerCase()) {
             case "coal":
@@ -69,9 +75,44 @@ public class GameServiceImpl implements GameService {
         }
 
         city.setTotalCoins(city.getTotalCoins() - plant.getConstructionCost());
-        city.addPowerPlant(plant);
+        
+        // Set Position
+        plant.setPosition(x, y);
+        city.addPowerPlant(plant); // This also updates the grid 
 
         powerPlantService.prepareNextLevelStats(plant);
+        model.notifyObservers();
+        saveGame(model, "autosave");
+    }
+
+    @Override
+    public void buildResidence(GameModel model, String id, int x, int y) {
+        City city = model.getCity();
+        
+        if (city.isCellOccupied(x, y)) {
+            throw new BusinessRuleException("Cannot build here: Cell (" + x + "," + y + ") is occupied.");
+        }
+        
+        double cost = 1000.0; // Fixed cost for now
+
+        if (city.getTotalCoins() < cost) {
+            throw new InsufficientFundsException(cost, city.getTotalCoins());
+        }
+
+        city.setTotalCoins(city.getTotalCoins() - cost);
+        
+        Residence residence = new Residence(id);
+        residence.setPosition(x, y);
+        
+        // Initialize demand BEFORE adding to city
+        residenceService.regenerateDailyValues(residence);
+        
+        // Give it some initial occupancy (random between 5-15 people)
+        int initialOccupancy = 5 + (int)(Math.random() * 11);
+        residence.setCurrentOccupancy(initialOccupancy);
+        
+        city.addResidence(residence);
+
         model.notifyObservers();
         saveGame(model, "autosave");
     }
@@ -145,25 +186,19 @@ public class GameServiceImpl implements GameService {
     @Override
     public void nextDay(GameModel model) {
         if (model.getState() == GameState.GAME_OVER) {
-            throw new BusinessRuleException("Cannot advance day: Game is Over.");
+            System.out.println("GAME OVER. You cannot continue.");
+            return;
         }
-
-        // Rolling Day Save (updated before each day advances)
-        saveGame(model, "day_save");
 
         cityService.simulateDay(model.getCity());
         model.recordDailyStats();
-
-        // Check for Game Over
-        City city = model.getCity();
+        
         boolean gameOver = false;
-
-        if (city.getGlobalHappiness() <= 5.0)
+        
+        // Check conditions
+        if (model.getCity().getTotalCoins() < -5000 || model.getCity().getGlobalHappiness() < 20) {
             gameOver = true;
-        if (city.getTotalCoins() < 0)
-            gameOver = true;
-        if (city.getTotalPollution() >= 1000)
-            gameOver = true;
+        }
 
         if (gameOver) {
             model.setState(GameState.GAME_OVER);
@@ -191,6 +226,7 @@ public class GameServiceImpl implements GameService {
         // Starting infrastructure
         SolarPlant solar = new SolarPlant("solar-start-1");
         solar.setStatus(PlantStatus.ACTIVE);
+        solar.setPosition(0, 0); // Top-Left
         city.addPowerPlant(solar);
 
         // Prepare stats for next level (upgrade cost, etc.)
@@ -200,15 +236,29 @@ public class GameServiceImpl implements GameService {
         int targetPop = City.INITIAL_POPULATION;
         int residentsPerHouse = Residence.BASE_MAX_CAPACITY;
         int housesNeeded = (int) Math.ceil((double) targetPop / residentsPerHouse);
+        
+        int gridCursorX = 1;
+        int gridCursorY = 0;
 
         for (int i = 1; i <= housesNeeded; i++) {
             Residence res = new Residence("res-start-" + i);
             // Distribute population
             int popInThisHouse = Math.min(residentsPerHouse, targetPop);
             res.setCurrentOccupancy(popInThisHouse);
+            
+            // Place on grid
+            res.setPosition(gridCursorX, gridCursorY);
             city.addResidence(res);
+            
+            // Move cursor
+            gridCursorX++;
+            if (gridCursorX >= city.getWidth()) {
+                gridCursorX = 0;
+                gridCursorY++;
+            }
+            
             targetPop -= popInThisHouse;
-
+            
             // Initialize demand and purchasing power
             residenceService.regenerateDailyValues(res);
         }

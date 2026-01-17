@@ -23,10 +23,19 @@ public class City implements Serializable {
     public static final int INITIAL_POPULATION = 100;
     public static final double DEFAULT_ELECTRICITY_PRICE = 12.0;
 
+    public static final int INITIAL_GRID_WIDTH = 10;
+    public static final int INITIAL_GRID_HEIGHT = 10;
+
     private String name;
     private int currentDay;
+    private int currentHour; // 0-23
     private double totalCoins;
     private double electricityPrice;
+
+    // Grid System
+    private int width;
+    private int height;
+    private Building[][] grid;
 
     private double globalHappiness;
     private int totalPopulation;
@@ -59,6 +68,10 @@ public class City implements Serializable {
         this.totalCoins = initialCoins;
         this.currentDay = 1;
         this.electricityPrice = DEFAULT_ELECTRICITY_PRICE;
+        
+        this.width = INITIAL_GRID_WIDTH;
+        this.height = INITIAL_GRID_HEIGHT;
+        this.grid = new Building[width][height];
 
         this.globalHappiness = 100.0;
         this.totalPopulation = 0; // Will be populated by createNewGame logic
@@ -76,6 +89,10 @@ public class City implements Serializable {
 
     public int getCurrentDay() {
         return currentDay;
+    }
+    
+    public int getCurrentHour() {
+        return currentHour;
     }
 
     public double getTotalCoins() {
@@ -130,6 +147,10 @@ public class City implements Serializable {
 
     public void setCurrentDay(int currentDay) {
         this.currentDay = currentDay;
+    }
+    
+    public void setCurrentHour(int currentHour) {
+        this.currentHour = currentHour;
     }
 
     public void setTotalCoins(double totalCoins) {
@@ -193,9 +214,26 @@ public class City implements Serializable {
 
     public void addPowerPlant(PowerPlant plant) {
         this.powerPlants.add(plant);
+        placeOnGrid(plant);
     }
 
     public void addResidence(Residence residence) {
         this.residences.add(residence);
+        placeOnGrid(residence);
     }
+    
+    private void placeOnGrid(Building b) {
+        if (b.getX() >= 0 && b.getX() < width && b.getY() >= 0 && b.getY() < height) {
+            grid[b.getX()][b.getY()] = b;
+        }
+    }
+    
+    public boolean isCellOccupied(int x, int y) {
+        if (x < 0 || x >= width || y < 0 || y >= height) return true; // Out of bounds is "occupied"
+        return grid[x][y] != null;
+    }
+    
+    public int getWidth() { return width; }
+    public int getHeight() { return height; }
+    public Building[][] getGrid() { return grid; }
 }

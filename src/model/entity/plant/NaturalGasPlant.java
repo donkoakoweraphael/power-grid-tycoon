@@ -18,9 +18,9 @@ public class NaturalGasPlant extends PowerPlant {
     public static final int DEFAULT_MAX_LEVEL = 5;
 
     // Stats at level 1
-    public static final double BASE_POWER_OUTPUT = 100.0;
-    public static final double BASE_STORAGE_CAPACITY = 150.0;
-    public static final double BASE_DAILY_COST = 85.0;
+    public static final double BASE_POWER_OUTPUT = 15.0; // Reduced for game balance
+    public static final double BASE_STORAGE_CAPACITY = 25.0;
+    public static final double BASE_DAILY_COST = 375.0; // Higher cost (fuel expenses)
     public static final double BASE_POLLUTION_RATE = 50.0;
 
     // Growth rates per level

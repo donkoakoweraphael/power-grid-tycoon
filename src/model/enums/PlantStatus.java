@@ -4,23 +4,11 @@ package model.enums;
  * Enum representing the operational status of a power plant.
  */
 public enum PlantStatus {
-    /**
-     * The plant is currently under construction.
-     */
+    PLANNING,
     UNDER_CONSTRUCTION,
-
-    /**
-     * The plant is currently being upgraded.
-     */
-    UPGRADING,
-
-    /**
-     * The plant is active and operational.
-     */
     ACTIVE,
-
-    /**
-     * The plant is inactive (manually stopped or due to failure).
-     */
+    PAUSED, // Player manually paused for maintenance or saving fuel
+    UPGRADING,
+    BROKEN, // Event-driven failure
     INACTIVE
 }

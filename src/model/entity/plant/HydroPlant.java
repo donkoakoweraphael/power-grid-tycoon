@@ -19,9 +19,9 @@ public class HydroPlant extends PowerPlant {
     public static final int DEFAULT_MAX_LEVEL = 4;
 
     // Stats at level 1
-    public static final double BASE_POWER_OUTPUT = 80.0;
-    public static final double BASE_STORAGE_CAPACITY = 1200.0; // 15x ratio - natural reservoir!
-    public static final double BASE_DAILY_COST = 45.0;
+    public static final double BASE_POWER_OUTPUT = 12.0; // Reduced for game balance
+    public static final double BASE_STORAGE_CAPACITY = 180.0; // 15x ratio - natural reservoir!
+    public static final double BASE_DAILY_COST = 300.0; // Moderate cost (expensive infrastructure)
     public static final double BASE_POLLUTION_RATE = 0.0; // Eco-friendly
 
     // Growth rates per level

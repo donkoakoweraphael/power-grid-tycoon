@@ -9,9 +9,14 @@ import model.entity.PowerPlant;
 public interface GameService {
 
     /**
-     * Allows a player to buy and place a new power plant.
+     * Allows a player to buy and place a new power plant at specific coordinates.
      */
-    void buyPowerPlant(model.GameModel model, String type, String id);
+    void buyPowerPlant(model.GameModel model, String type, String id, int x, int y);
+
+    /**
+     * Allows a player to build a new residence at specific coordinates.
+     */
+    void buildResidence(model.GameModel model, String id, int x, int y);
 
     /**
      * Starts an upgrade for a specific building (PowerPlant or Residence).
@@ -29,7 +34,7 @@ public interface GameService {
     void togglePlantStatus(model.GameModel model, PowerPlant plant);
 
     /**
-     * Advances the game to the next day (The "Next Day" button action).
+     * Advances the game to the next time step (Hour).
      */
     void nextDay(model.GameModel model);
 

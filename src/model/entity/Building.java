@@ -12,6 +12,9 @@ public abstract class Building implements Serializable {
     protected int level;
     protected int maxLevel;
 
+    protected int x;
+    protected int y;
+
     /**
      * Constructor for Building.
      * 
@@ -22,6 +25,8 @@ public abstract class Building implements Serializable {
         this.id = id;
         this.level = 1;
         this.maxLevel = maxLevel;
+        this.x = -1; // Default unplaced
+        this.y = -1;
     }
 
     // ========== Getters ==========
@@ -37,6 +42,14 @@ public abstract class Building implements Serializable {
     public int getMaxLevel() {
         return maxLevel;
     }
+    
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
 
     // ========== Setters ==========
 
@@ -51,6 +64,31 @@ public abstract class Building implements Serializable {
     public void setMaxLevel(int maxLevel) {
         this.maxLevel = maxLevel;
     }
+    
+    public void setPosition(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+    
+    public double getHealth() {
+        return health;
+    }
+    
+    public void setHealth(double health) {
+        this.health = Math.max(0, Math.min(maxHealth, health));
+    }
+    
+    public double getMaxHealth() {
+        return maxHealth;
+    }
+    
+    public void takeDamage(double damage) {
+        this.health = Math.max(0, this.health - damage);
+    }
+    
+    public boolean isDestroyed() {
+        return health <= 0;
+    }
 
     // ========== Standard Methods ==========
 
@@ -58,6 +96,7 @@ public abstract class Building implements Serializable {
     public String toString() {
         return "Building{" +
                 "id='" + id + '\'' +
+                ", pos=(" + x + "," + y + ")" +
                 ", level=" + level +
                 ", maxLevel=" + maxLevel +
                 '}';

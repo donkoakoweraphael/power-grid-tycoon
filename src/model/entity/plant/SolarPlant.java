@@ -19,9 +19,9 @@ public class SolarPlant extends PowerPlant {
     public static final int DEFAULT_MAX_LEVEL = 4;
 
     // Stats at level 1
-    public static final double BASE_POWER_OUTPUT = 40.0;
-    public static final double BASE_STORAGE_CAPACITY = 160.0; // 4x ratio for day/night buffering
-    public static final double BASE_DAILY_COST = 20.0;
+    public static final double BASE_POWER_OUTPUT = 8.0; // Reduced for game balance
+    public static final double BASE_STORAGE_CAPACITY = 32.0; // 4x ratio for day/night buffering
+    public static final double BASE_DAILY_COST = 200.0; // Cheapest option (baseline)
     public static final double BASE_POLLUTION_RATE = 0.0; // Eco-friendly
 
     // Growth rates per level

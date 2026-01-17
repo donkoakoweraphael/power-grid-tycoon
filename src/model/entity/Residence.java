@@ -16,6 +16,14 @@ public class Residence extends Building {
     public static final double BASE_PURCHASING_POWER_MIN = 35.0; // coins/MWh
     public static final double BASE_PURCHASING_POWER_MAX = 60.0; // coins/MWh
     public static final int DEFAULT_MAX_LEVEL = 5;
+    
+    // Hourly Demand Profile (0h to 23h). 1.0 = Average.
+    public static final double[] HOURLY_DEMAND_CURVE = {
+        0.5, 0.4, 0.4, 0.4, 0.5, 0.6, // 00-05 Night
+        1.1, 1.3, 1.0, 0.9, 0.8, 0.8, // 06-11 Morning
+        0.8, 0.8, 0.9, 1.0, 1.2, 1.4, // 12-17 Afternoon
+        1.6, 1.7, 1.6, 1.4, 1.1, 0.8  // 18-23 Evening Peak
+    };
 
     // Growth Rates per Level
     public static final double CAPACITY_GROWTH_RATE = 1.5; // +50% capacity/level
@@ -38,7 +46,7 @@ public class Residence extends Building {
     private int currentOccupancy;
 
     // Demande énergétique PAR RÉSIDENCE
-    private double energyDemand; // MWh/jour (pour toute la résidence)
+    private double energyDemand; // MWh/jour (Base Daily Demand)
     private double energyDemandMin; // Intervalle
     private double energyDemandMax;
 
@@ -57,6 +65,13 @@ public class Residence extends Building {
         this.maxCapacity = BASE_MAX_CAPACITY;
         this.currentOccupancy = 0;
         this.isSupplied = true; // Default to true until first check
+    }
+    
+    // Get demand specific to the hour
+    public double getByHourDemand(int hour) {
+        if (hour < 0 || hour > 23) return 0;
+        // Daily Demand / 24 * Curve Factor
+        return (energyDemand / 24.0) * HOURLY_DEMAND_CURVE[hour];
     }
 
     // ========== Getters ==========

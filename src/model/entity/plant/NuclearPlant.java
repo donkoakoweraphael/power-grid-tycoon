@@ -19,9 +19,9 @@ public class NuclearPlant extends PowerPlant {
     public static final int DEFAULT_MAX_LEVEL = 3; // Fewer levels due to complexity
 
     // Stats at level 1
-    public static final double BASE_POWER_OUTPUT = 400.0;
-    public static final double BASE_STORAGE_CAPACITY = 800.0; // 2x ratio for safety reserves
-    public static final double BASE_DAILY_COST = 140.0;
+    public static final double BASE_POWER_OUTPUT = 60.0; // Reduced for game balance
+    public static final double BASE_STORAGE_CAPACITY = 120.0; // 2x ratio for safety reserves
+    public static final double BASE_DAILY_COST = 1500.0; // Very expensive (safety + waste management)
     public static final double BASE_POLLUTION_RATE = 5.0; // Low (radioactive waste)
 
     // Growth rates per level
