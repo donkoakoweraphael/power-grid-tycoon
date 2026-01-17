@@ -18,9 +18,11 @@ public class StatusPanel extends JPanel {
     
     private javax.swing.Timer clockTimer;
     private int displayMinutes = 0;
+    private int lastHour = -1;
     
     public StatusPanel(GameModel model) {
         this.model = model;
+        this.lastHour = model.getCity().getCurrentHour();
         
         setLayout(new FlowLayout(FlowLayout.LEFT, 25, 15));
         setBackground(new Color(250, 250, 250));
@@ -57,8 +59,11 @@ public class StatusPanel extends JPanel {
     }
     
     public void startClockAnimation() {
-        // Horloge visuelle qui montre les minutes qui passent (purement cosmetique)
-        clockTimer = new javax.swing.Timer(100, e -> {
+        // Horloge visuelle plus lente (250ms = 1 minute simulee)
+        // 1h simulee = 15 secondes reelles
+        if (clockTimer != null && clockTimer.isRunning()) return;
+        
+        clockTimer = new javax.swing.Timer(250, e -> {
             displayMinutes = (displayMinutes + 1) % 60;
             updateClockDisplay();
         });
@@ -86,13 +91,21 @@ public class StatusPanel extends JPanel {
     }
     
     public void update() {
-        // Synchroniser les minutes affichees quand l'heure change
-        displayMinutes = 0;
+        // Detecter le changement d'heure reelle pour reset les minutes du visuel
+        int currentHour = model.getCity().getCurrentHour();
+        if (currentHour != lastHour) {
+            displayMinutes = 0;
+            lastHour = currentHour;
+        }
         
-        dayLabel.setText(String.format("[J%d %02d:%02d]", 
-            model.getCity().getCurrentDay(), 
-            model.getCity().getCurrentHour(),
-            displayMinutes));
+        // On ne force pas le redraw du label temps ici pour ne pas ecraser l'animation
+        // Sauf si les minutes sont a 0 (nouvelle heure)
+        if (displayMinutes == 0) {
+            dayLabel.setText(String.format("[J%d %02d:%02d]", 
+                model.getCity().getCurrentDay(), 
+                currentHour,
+                0));
+        }
         
         moneyLabel.setText(String.format("$ %.0f pieces", 
             model.getCity().getTotalCoins()));
