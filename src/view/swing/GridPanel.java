@@ -23,16 +23,18 @@ public class GridPanel extends JPanel {
         this.model = model;
         this.frame = frame;
         
-        int width = model.getCity().getWidth() * CELL_SIZE;
-        int height = model.getCity().getHeight() * CELL_SIZE;
-        setPreferredSize(new Dimension(width, height));
-        setBackground(GRASS_COLOR);
+        int LABEL_OFFSET = 25;
+        int gridSize = model.getCity().getWidth() * CELL_SIZE + LABEL_OFFSET;
+        setPreferredSize(new Dimension(gridSize, gridSize));
+        setBackground(Color.BLACK);
         
         // Mouse click listener
         addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
-                int gridX = e.getX() / CELL_SIZE;
-                int gridY = e.getY() / CELL_SIZE;
+                int LABEL_OFFSET = 25;
+                int gridX = (e.getX() - LABEL_OFFSET) / CELL_SIZE;
+                int gridY = (e.getY() - LABEL_OFFSET) / CELL_SIZE;
                 
                 if (gridX >= 0 && gridX < model.getCity().getWidth() && 
                     gridY >= 0 && gridY < model.getCity().getHeight()) {
@@ -52,11 +54,29 @@ public class GridPanel extends JPanel {
         int gridWidth = model.getCity().getWidth();
         int gridHeight = model.getCity().getHeight();
         
+        int LABEL_OFFSET = 25; // Space for axis labels
+        
+        // Draw axis labels
+        g2d.setFont(new Font("Arial", Font.BOLD, 14));
+        g2d.setColor(Color.WHITE);
+        
+        // X-axis labels (top)
+        for (int x = 0; x < gridWidth; x++) {
+            int px = LABEL_OFFSET + x * CELL_SIZE + CELL_SIZE / 2;
+            g2d.drawString(String.valueOf(x), px - 4, 18);
+        }
+        
+        // Y-axis labels (left)
+        for (int y = 0; y < gridHeight; y++) {
+            int py = LABEL_OFFSET + y * CELL_SIZE + CELL_SIZE / 2;
+            g2d.drawString(String.valueOf(y), 8, py + 5);
+        }
+        
         // Draw grass tiles with checkerboard pattern for depth
         for (int x = 0; x < gridWidth; x++) {
             for (int y = 0; y < gridHeight; y++) {
-                int px = x * CELL_SIZE;
-                int py = y * CELL_SIZE;
+                int px = LABEL_OFFSET + x * CELL_SIZE;
+                int py = LABEL_OFFSET + y * CELL_SIZE;
                 
                 // Alternating grass shades for depth
                 boolean isDark = (x + y) % 2 == 0;
@@ -79,15 +99,15 @@ public class GridPanel extends JPanel {
             for (int y = 0; y < gridHeight; y++) {
                 Building b = grid[x][y];
                 if (b != null) {
-                    drawBuilding(g2d, b, x, y);
+                    drawBuilding(g2d, b, x, y, LABEL_OFFSET);
                 }
             }
         }
     }
     
-    private void drawBuilding(Graphics2D g2d, Building b, int x, int y) {
-        int px = x * CELL_SIZE;
-        int py = y * CELL_SIZE;
+    private void drawBuilding(Graphics2D g2d, Building b, int x, int y, int offset) {
+        int px = offset + x * CELL_SIZE;
+        int py = offset + y * CELL_SIZE;
         
         // Building colors and style
         Color baseColor, accentColor;

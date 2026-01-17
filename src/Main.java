@@ -24,6 +24,15 @@ public class Main {
     }
     
     private static void launchSwingUI() {
+        // Set system Look & Feel (Windows native on Windows)
+        try {
+            javax.swing.UIManager.setLookAndFeel(
+                javax.swing.UIManager.getSystemLookAndFeelClassName()
+            );
+        } catch (Exception e) {
+            // Fallback to default if system L&F not available
+        }
+        
         GameController controller = new GameController();
         controller.startConsole("SimCity");
         

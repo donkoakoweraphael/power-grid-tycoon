@@ -192,27 +192,33 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public void nextDay(GameModel model) {
-        if (model.getState() == GameState.GAME_OVER) {
-            System.out.println("GAME OVER. You cannot continue.");
-            return;
-        }
-
         cityService.simulateDay(model.getCity());
         model.recordDailyStats();
         
+        // Check game over conditions
+        City city = model.getCity();
         boolean gameOver = false;
+        String reason = "";
         
-        // Check conditions
-        if (model.getCity().getTotalCoins() < -5000 || model.getCity().getGlobalHappiness() < 20) {
+        // Happiness below 5% (was 20%, too strict)
+        if (city.getGlobalHappiness() < 5.0) {
             gameOver = true;
+            reason = "GAME OVER: Bonheur trop faible (< 5%) - Emeutes!";
         }
-
+        
+        // Money below -10
+        if (city.getTotalCoins() < -10.0) {
+            gameOver = true;
+            reason = "GAME OVER: Faillite (argent < -10)!";
+        }
+        
         if (gameOver) {
             model.setState(GameState.GAME_OVER);
+            System.out.println(reason);
+            // Stop the timer in UI if running
         }
-
+        
         model.notifyObservers();
-        // Also autosave current state after simulation
         saveGame(model, "autosave");
     }
 

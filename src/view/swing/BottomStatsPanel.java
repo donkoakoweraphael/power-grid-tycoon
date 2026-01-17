@@ -25,12 +25,12 @@ public class BottomStatsPanel extends JPanel {
             BorderFactory.createEmptyBorder(8, 15, 8, 15)
         ));
         
-        Font labelFont = new Font("Segoe UI", Font.PLAIN, 12);
+        Font labelFont = new Font("Segoe UI", Font.BOLD, 12);
         
-        productionLabel = createStatLabel("Production: 0.0 MW", new Color(76, 175, 80));
-        demandLabel = createStatLabel("Demande: 0.0 MW", new Color(33, 150, 243));
-        deficitLabel = createStatLabel("Equilibre: 0.0 MW", new Color(117, 117, 117));
-        pollutionLabel = createStatLabel("Pollution: 0 PP", new Color(255, 152, 0));
+        productionLabel = createStatLabel("Production: 0.0 MW", new Color(46, 125, 50));  // Dark green
+        demandLabel = createStatLabel("Demande: 0.0 MW", new Color(25, 118, 210));       // Dark blue
+        deficitLabel = createStatLabel("Equilibre: 0.0 MW", new Color(97, 97, 97));      // Dark gray
+        pollutionLabel = createStatLabel("Pollution: 0 PP", new Color(230, 81, 0));      // Dark orange
         
         productionLabel.setFont(labelFont);
         demandLabel.setFont(labelFont);
@@ -66,18 +66,18 @@ public class BottomStatsPanel extends JPanel {
         double balance = production - demand;
         double pollution = model.getCity().getTotalPollution();
         
-        productionLabel.setText(String.format("Production: %.1f MW", production));
-        demandLabel.setText(String.format("Demande: %.1f MW", demand));
+        productionLabel.setText(String.format("[+] Production: %.1f MW", production));
+        demandLabel.setText(String.format("[-] Demande: %.1f MW", demand));
         
         // Update balance color based on deficit/surplus
         if (balance >= 0) {
-            deficitLabel.setText(String.format("Surplus: +%.1f MW", balance));
+            deficitLabel.setText(String.format("[OK] Surplus: +%.1f MW", balance));
             deficitLabel.setForeground(new Color(76, 175, 80));
         } else {
-            deficitLabel.setText(String.format("Deficit: %.1f MW", balance));
+            deficitLabel.setText(String.format("[!] Deficit: %.1f MW", balance));
             deficitLabel.setForeground(new Color(244, 67, 54));
         }
         
-        pollutionLabel.setText(String.format("Pollution: %.0f PP", pollution));
+        pollutionLabel.setText(String.format("[P] Pollution: %.0f PP", pollution));
     }
 }

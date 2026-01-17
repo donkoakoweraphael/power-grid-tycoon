@@ -80,10 +80,15 @@ public class CityServiceImpl implements CityService {
         double purchasingPower = city.getResidences().stream()
                 .mapToDouble(model.entity.Residence::getPurchasingPower).average().orElse(0.0);
 
+        // Calculate current pollution from all power plants
+        double pollution = city.getPowerPlants().stream()
+                .mapToDouble(p -> powerPlantService.calculatePollution(p) / 24.0).sum();
+
         city.setTotalPopulation(population);
         city.setTotalEnergyDemand(demand);
         city.setTotalStorageCapacity(capacity);
         city.setAvgPurchasingPower(purchasingPower);
+        city.setTotalPollution(pollution);
     }
 
     @Override
